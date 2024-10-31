@@ -25,7 +25,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			isPlaying := ps.IsPlaying
 			ps.Stop()
 			is.Next()
-			is.Update(w, ps)
+			is.Update(w, ps, true)
 			ps.PlayPause()
 			if !isPlaying {
 				ps.PlayPause()
@@ -35,7 +35,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			isPlaying := ps.IsPlaying
 			ps.Stop()
 			is.Previous()
-			is.Update(w, ps)
+			is.Update(w, ps, true)
 			ps.PlayPause()
 			if !isPlaying {
 				ps.PlayPause()
@@ -80,6 +80,9 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 		}
 		if e.Name == "R" {
 			is.Zoomable.Reset()
+			is.Brightness = 1
+			is.Contrast = 1
+			is.Update(w, ps, false)
 		}
 		if e.Name == "K" {
 			is.Zoomable.Move(0, 10)
@@ -98,6 +101,26 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 		}
 		if e.Name == "-" || e.Name == "_" {
 			is.Zoomable.Zoom(-0.2)
+		}
+		if e.Name == "B" {
+			is.Brightness -= 0.01
+			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness, 'f', 2, 64))
+			is.Update(w, ps, false)
+		}
+		if e.Name == "N" {
+			is.Brightness += 0.01
+			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness, 'f', 2, 64))
+			is.Update(w, ps, false)
+		}
+		if e.Name == "V" {
+			is.Contrast -= 0.01
+			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast, 'f', 2, 64))
+			is.Update(w, ps, false)
+		}
+		if e.Name == "M" {
+			is.Contrast += 0.01
+			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast, 'f', 2, 64))
+			is.Update(w, ps, false)
 		}
 	})
 }

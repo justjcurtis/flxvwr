@@ -60,7 +60,7 @@ func main() {
 
 	ticker := time.NewTicker(100 * time.Millisecond)
 	handleResize := func() {
-		ImageService.HandleResize(w, PlayerService)
+		ImageService.Update(w, PlayerService, false)
 	}
 	currentWidth := w.Canvas().Size().Width
 	currentHeight := w.Canvas().Size().Height
@@ -74,7 +74,7 @@ func main() {
 			if PlayerService.IsPlaying {
 				if time.Since(PlayerService.LastSet) >= PlayerService.CurrentDelay {
 					ImageService.Next()
-					ImageService.Update(w, PlayerService)
+					ImageService.Update(w, PlayerService, true)
 				}
 			}
 		}
@@ -84,7 +84,7 @@ func main() {
 
 	w.SetOnDropped(func(pos fyne.Position, uri []fyne.URI) {
 		ImageService.ImportImages(pos, uri)
-		ImageService.Update(w, PlayerService)
+		ImageService.Update(w, PlayerService, true)
 		PlayerService.LastSet = time.Now()
 		PlayerService.IsPlaying = true
 	})

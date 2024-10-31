@@ -3,6 +3,10 @@ package services
 import (
 	"flxvwr/models"
 	"flxvwr/utils"
+	"image"
+	"image/color"
+	"math"
+	"os"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -22,6 +26,8 @@ type ImageService struct {
 	current    int
 	playlist   []string
 	Zoomable   *models.ZoomableImage
+	Brightness float64
+	Contrast   float64
 }
 
 func NewImageService() *ImageService {
@@ -29,6 +35,8 @@ func NewImageService() *ImageService {
 	is.imagePaths = make(map[string]fyne.URI)
 	is.current = 0
 	is.playlist = make([]string, 0)
+	is.Brightness = 1.0
+	is.Contrast = 1.0
 	return is
 }
 
@@ -107,23 +115,35 @@ func (is *ImageService) Clear() {
 	is.playlist = make([]string, 0)
 }
 
-func (is *ImageService) Update(w fyne.Window, ps *PlayerService) {
+func (is *ImageService) Update(w fyne.Window, ps *PlayerService, restartDelay bool) {
 	if len(is.playlist) == 0 {
 		return
 	}
-	w.SetContent(is.GetImageContainer(w, ps))
-	ps.LastSet = time.Now()
-}
 
-func (is *ImageService) HandleResize(w fyne.Window, ps *PlayerService) {
-	if is.Zoomable == nil {
-		return
+	var oldScale float32 = 1.0
+	var oldOffsetX float32 = 0.0
+	var oldOffsetY float32 = 0.0
+
+	if is.Zoomable != nil {
+		oldScale = is.Zoomable.Scale
+		oldOffsetX = is.Zoomable.OffsetX
+		oldOffsetY = is.Zoomable.OffsetY
 	}
 	w.SetContent(is.GetImageContainer(w, ps))
+	is.Zoomable.Scale = oldScale
+	is.Zoomable.OffsetX = oldOffsetX
+	is.Zoomable.OffsetY = oldOffsetY
+	is.Zoomable.Refresh()
+
+	if restartDelay {
+		ps.LastSet = time.Now()
+	}
 }
 
 func (is *ImageService) GetImageContainer(w fyne.Window, ps *PlayerService) *fyne.Container {
-	image := canvas.NewImageFromURI(is.GetCurrent())
+	img := is.GetImageFromURI(is.GetCurrent())
+	adjusted := is.AdjustBrightnessAndContrast(img)
+	image := canvas.NewImageFromImage(adjusted)
 	image.FillMode = canvas.ImageFillContain
 	zoomable := models.NewZoomableImage(image)
 	is.Zoomable = zoomable
@@ -131,7 +151,52 @@ func (is *ImageService) GetImageContainer(w fyne.Window, ps *PlayerService) *fyn
 	width := w.Canvas().Size().Width
 	height := w.Canvas().Size().Height
 	imgContainer.Resize(fyne.NewSize(width, height))
-	zoomable.Image.Resize(imgContainer.Size()) // Resize the image to fit container initially
+	zoomable.Image.Resize(imgContainer.Size())
 	imgContainer.Move(fyne.NewPos(0, 0))
 	return container.NewStack(imgContainer)
+}
+
+func (is *ImageService) GetImageFromURI(uri fyne.URI) image.Image {
+	file, err := os.Open(uri.Path())
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	img, _, err := image.Decode(file)
+	if err != nil {
+		panic(err)
+	}
+	return img
+}
+
+func (is *ImageService) AdjustBrightnessAndContrast(img image.Image) image.Image {
+	bounds := img.Bounds()
+	adjusted := image.NewRGBA(bounds)
+
+	// Loop through each pixel
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
+			originalColor := color.RGBAModel.Convert(img.At(x, y)).(color.RGBA)
+
+			// Adjust brightness
+			r := float64(originalColor.R) * is.Brightness
+			g := float64(originalColor.G) * is.Brightness
+			b := float64(originalColor.B) * is.Brightness
+
+			// Adjust contrast
+			r = (r-128)*is.Contrast + 128
+			g = (g-128)*is.Contrast + 128
+			b = (b-128)*is.Contrast + 128
+
+			// Clamp color values to [0, 255] range
+			adjustedColor := color.RGBA{
+				R: uint8(math.Min(math.Max(r, 0), 255)),
+				G: uint8(math.Min(math.Max(g, 0), 255)),
+				B: uint8(math.Min(math.Max(b, 0), 255)),
+				A: originalColor.A,
+			}
+			adjusted.Set(x, y, adjustedColor)
+		}
+	}
+	return adjusted
 }

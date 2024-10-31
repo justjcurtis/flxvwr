@@ -1,22 +1,23 @@
 package views
 
 import (
+	"image/color"
+
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/widget"
 )
 
 func StartView(a fyne.App) *fyne.Container {
-	hello := widget.NewLabel("Drop images/directories here")
+	hello := canvas.NewText("Drop images/directories here", color.White)
+	hello.TextStyle.Bold = true
+	hello.TextSize = 24
 	return container.NewCenter(
 		container.NewVBox(
 			hello,
-			widget.NewButton("Settings", func() {
-				settingsWindow := Settings(a)
-				settingsWindow.Show()
-			}),
-			container.NewPadded(),
-			ShortcutKey(),
+			container.NewPadded(
+				ShortcutKey(),
+			),
 		),
 	)
 }

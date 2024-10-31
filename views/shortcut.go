@@ -13,12 +13,14 @@ var ShortcutMap map[string]string = map[string]string{
 	"Clear":            "C",
 	"Play/Pause":       "Space",
 	"Prev/Next":        "Left/Right",
-	"Delay +/- 0.5":    "Up/Down",
+	"Delay +/-":        "Up/Down",
 	"Shuffle":          "S",
-	"Settings":         "/",
-	"Pan LRDU":         "HLJK",
 	"Zoom +/-":         "+/-",
+	"Pan LRDU":         "HLJK",
 	"Reset Zoom & Pan": "R",
+	"Brightness +/-":   "B/N",
+	"Contrast +/-":     "V/M",
+	"Settings":         "/",
 }
 
 func ShortcutKey() *fyne.Container {
