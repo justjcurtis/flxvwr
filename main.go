@@ -58,8 +58,19 @@ func main() {
 
 	shortcuts.SetupShortcuts(a, w, ImageService, PlayerService, NotificationService)
 
+	ticker := time.NewTicker(100 * time.Millisecond)
+	handleResize := func() {
+		ImageService.HandleResize(w, PlayerService)
+	}
+	currentWidth := w.Canvas().Size().Width
+	currentHeight := w.Canvas().Size().Height
 	go func() {
-		for {
+		for range ticker.C {
+			if currentWidth != w.Canvas().Size().Width || currentHeight != w.Canvas().Size().Height {
+				handleResize()
+				currentWidth = w.Canvas().Size().Width
+				currentHeight = w.Canvas().Size().Height
+			}
 			if PlayerService.IsPlaying {
 				if time.Since(PlayerService.LastSet) >= PlayerService.CurrentDelay {
 					ImageService.Next()

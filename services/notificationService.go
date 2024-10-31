@@ -35,9 +35,10 @@ func (ns *NotificationService) Init(w fyne.Window) {
 	content.Move(fyne.NewPos(5, 5))
 	content.Resize(notificationText.MinSize())
 	w.Canvas().Overlays().Add(boxContainer)
+	ticker := time.NewTicker(100 * time.Millisecond)
 	go func() {
 		lastMessage := ""
-		for {
+		for range ticker.C {
 			if ns.CurrentMessage != lastMessage {
 				background.SetMinSize(notificationText.MinSize())
 				background.Show()
@@ -45,7 +46,6 @@ func (ns *NotificationService) Init(w fyne.Window) {
 				content.Resize(notificationText.MinSize())
 				lastMessage = ns.CurrentMessage
 			}
-			time.Sleep(50 * time.Millisecond)
 			if len(ns.CurrentMessage) > 0 && time.Since(ns.lastNotificationSet) >= 2*time.Second {
 				notificationText.SetText("")
 				ns.CurrentMessage = ""

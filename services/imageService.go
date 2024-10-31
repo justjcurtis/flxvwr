@@ -108,8 +108,18 @@ func (is *ImageService) Clear() {
 }
 
 func (is *ImageService) Update(w fyne.Window, ps *PlayerService) {
+	if len(is.playlist) == 0 {
+		return
+	}
 	w.SetContent(is.GetImageContainer(w, ps))
 	ps.LastSet = time.Now()
+}
+
+func (is *ImageService) HandleResize(w fyne.Window, ps *PlayerService) {
+	if is.Zoomable == nil {
+		return
+	}
+	w.SetContent(is.GetImageContainer(w, ps))
 }
 
 func (is *ImageService) GetImageContainer(w fyne.Window, ps *PlayerService) *fyne.Container {
@@ -118,7 +128,9 @@ func (is *ImageService) GetImageContainer(w fyne.Window, ps *PlayerService) *fyn
 	zoomable := models.NewZoomableImage(image)
 	is.Zoomable = zoomable
 	imgContainer := container.NewWithoutLayout(zoomable.Image)
-	imgContainer.Resize(fyne.NewSize(800, 600))
+	width := w.Canvas().Size().Width
+	height := w.Canvas().Size().Height
+	imgContainer.Resize(fyne.NewSize(width, height))
 	zoomable.Image.Resize(imgContainer.Size()) // Resize the image to fit container initially
 	imgContainer.Move(fyne.NewPos(0, 0))
 	return container.NewStack(imgContainer)
