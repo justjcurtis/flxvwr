@@ -118,6 +118,12 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			is.RecalculatePlaylist()
 		}
 		if input == "Up" {
+			nextDelay := viper.GetFloat64("delay") + 1
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
+			viper.Set("delay", nextDelay)
+			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+		}
+		if input == "Shift+Up" {
 			nextDelay := viper.GetFloat64("delay") + 0.5
 			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			viper.Set("delay", nextDelay)
@@ -125,6 +131,15 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 		}
 		if input == "Down" {
 			nextDelay := viper.GetFloat64("delay") - 0.5
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
+			if nextDelay < 1 {
+				nextDelay = 1
+			}
+			viper.Set("delay", nextDelay)
+			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+		}
+		if input == "Shift+Down" {
+			nextDelay := viper.GetFloat64("delay") - 1
 			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			if nextDelay < 1 {
 				nextDelay = 1
@@ -143,21 +158,39 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			is.Update(w, ps, false)
 		}
 		if input == "K" {
-			is.Zoomable.Move(0, 10)
+			is.Zoomable.Move(0, 20)
+		}
+		if input == "Shift+K" {
+			is.Zoomable.Move(0, 5)
 		}
 		if input == "H" {
-			is.Zoomable.Move(10, 0)
+			is.Zoomable.Move(20, 0)
+		}
+		if input == "Shift+H" {
+			is.Zoomable.Move(5, 0)
 		}
 		if input == "J" {
-			is.Zoomable.Move(0, -10)
+			is.Zoomable.Move(0, -20)
+		}
+		if input == "Shift+J" {
+			is.Zoomable.Move(0, -5)
 		}
 		if input == "L" {
-			is.Zoomable.Move(-10, 0)
+			is.Zoomable.Move(-20, 0)
+		}
+		if input == "Shift+L" {
+			is.Zoomable.Move(-5, 0)
 		}
 		if input == "=" || input == "+" {
+			is.Zoomable.Zoom(0.5)
+		}
+		if input == "Shift+=" || input == "Shift++" {
 			is.Zoomable.Zoom(0.2)
 		}
 		if input == "-" || input == "_" {
+			is.Zoomable.Zoom(-0.5)
+		}
+		if input == "Shift+-" || input == "Shift+_" {
 			is.Zoomable.Zoom(-0.2)
 		}
 		if input == "B" {
