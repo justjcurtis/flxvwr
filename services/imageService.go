@@ -1,6 +1,7 @@
 package services
 
 import (
+	"flxvwr/models"
 	"flxvwr/utils"
 	"time"
 
@@ -20,6 +21,7 @@ type ImageService struct {
 	imagePaths map[string]fyne.URI
 	current    int
 	playlist   []string
+	Zoomable   *models.ZoomableImage
 }
 
 func NewImageService() *ImageService {
@@ -106,12 +108,18 @@ func (is *ImageService) Clear() {
 }
 
 func (is *ImageService) Update(w fyne.Window, ps *PlayerService) {
-	w.SetContent(is.GetImageContainer(ps))
+	w.SetContent(is.GetImageContainer(w, ps))
 	ps.LastSet = time.Now()
 }
 
-func (is *ImageService) GetImageContainer(ps *PlayerService) *fyne.Container {
+func (is *ImageService) GetImageContainer(w fyne.Window, ps *PlayerService) *fyne.Container {
 	image := canvas.NewImageFromURI(is.GetCurrent())
 	image.FillMode = canvas.ImageFillContain
-	return container.NewStack(image)
+	zoomable := models.NewZoomableImage(image)
+	is.Zoomable = zoomable
+	imgContainer := container.NewWithoutLayout(zoomable.Image)
+	imgContainer.Resize(fyne.NewSize(800, 600))
+	zoomable.Image.Resize(imgContainer.Size()) // Resize the image to fit container initially
+	imgContainer.Move(fyne.NewPos(0, 0))
+	return container.NewStack(imgContainer)
 }

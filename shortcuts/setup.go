@@ -30,7 +30,6 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			if !isPlaying {
 				ps.PlayPause()
 			}
-			ps.LastSet = ps.LastSet.Add(-ps.CurrentDelay)
 		}
 		if e.Name == "Left" {
 			isPlaying := ps.IsPlaying
@@ -78,6 +77,24 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 		if e.Name == "/" {
 			settingsWindow := views.Settings(a)
 			settingsWindow.Show()
+		}
+		if e.Name == "K" {
+			is.Zoomable.Move(0, -10)
+		}
+		if e.Name == "H" {
+			is.Zoomable.Move(-10, 0)
+		}
+		if e.Name == "J" {
+			is.Zoomable.Move(0, 10)
+		}
+		if e.Name == "L" {
+			is.Zoomable.Move(10, 0)
+		}
+		if e.Name == "=" || e.Name == "+" {
+			is.Zoomable.Zoom(0.2)
+		}
+		if e.Name == "-" || e.Name == "_" {
+			is.Zoomable.Zoom(-0.2)
 		}
 	})
 }
