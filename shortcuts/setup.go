@@ -104,22 +104,22 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 		}
 		if e.Name == "B" {
 			is.Brightness -= 0.01
-			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness, 'f', 2, 64))
+			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
 		}
 		if e.Name == "N" {
 			is.Brightness += 0.01
-			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness, 'f', 2, 64))
+			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
 		}
 		if e.Name == "V" {
 			is.Contrast -= 0.01
-			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast, 'f', 2, 64))
+			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
 		}
 		if e.Name == "M" {
 			is.Contrast += 0.01
-			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast, 'f', 2, 64))
+			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
 		}
 	})
