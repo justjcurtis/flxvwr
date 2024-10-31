@@ -8,6 +8,19 @@ import (
 	"fyne.io/fyne/v2/container"
 )
 
+var ShortcutMap map[string]string = map[string]string{
+	"Quit":             "Q/Escape",
+	"Clear":            "C",
+	"Play/Pause":       "Space",
+	"Prev/Next":        "Left/Right",
+	"Delay +/- 0.5":    "Up/Down",
+	"Shuffle":          "S",
+	"Settings":         "/",
+	"Pan LRDU":         "HLJK",
+	"Zoom +/-":         "+/-",
+	"Reset Zoom & Pan": "R",
+}
+
 func ShortcutKey() *fyne.Container {
 	title := canvas.NewText("Shortcuts", color.White)
 	title.TextSize = 20

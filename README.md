@@ -52,7 +52,12 @@ Launch the application, drag&drop images or directories into the window, and sta
 
 ## Roadmap
 
-- **Zoom & Pan**: Add support for zooming and panning on images.
+- **Zoom & Pan**: Fixes for keeping the image centered when zooming in/out are needed.
+- **Image Rotation**: Add support for rotating images.
+- **Image Metadata**: Display image metadata such as resolution, file size, and format.
+- **Image Sorting**: Sort images by name, date, or size.
+- **Image Filtering**: Filter images by file type or resolution.
+- **Brightness & Contrast**: Adjust the brightness and contrast of images via keyboard shortcuts.
 - **Thumbnail View**: Display a grid of image thumbnails for quicker navigation.
 - **Unit Tests**: Write tests to ensure the application functions as expected.
 

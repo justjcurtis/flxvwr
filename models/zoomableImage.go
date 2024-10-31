@@ -6,18 +6,20 @@ import (
 )
 
 type ZoomableImage struct {
-	Image   *canvas.Image
-	Scale   float32
-	OffsetX float32
-	OffsetY float32
+	Image     *canvas.Image
+	prevScale float32
+	Scale     float32
+	OffsetX   float32
+	OffsetY   float32
 }
 
 func NewZoomableImage(image *canvas.Image) *ZoomableImage {
 	return &ZoomableImage{
-		Image:   image,
-		Scale:   1.0,
-		OffsetX: 0,
-		OffsetY: 0,
+		Image:     image,
+		prevScale: 1.0,
+		Scale:     1.0,
+		OffsetX:   0,
+		OffsetY:   0,
 	}
 }
 
@@ -28,12 +30,13 @@ func (z *ZoomableImage) Reset() {
 }
 
 func (z *ZoomableImage) Refresh() {
-	newWidth := float32(z.Image.Size().Width) * z.Scale
-	newHeight := float32(z.Image.Size().Height) * z.Scale
+	newWidth := float32(z.Image.Size().Width) * (1 / z.prevScale) * z.Scale
+	newHeight := float32(z.Image.Size().Height) * (1 / z.prevScale) * z.Scale
+	z.prevScale = z.Scale
 	z.Image.Resize(fyne.NewSize(newWidth, newHeight))
-	z.Scale = 1
 	z.Image.Move(fyne.NewPos(z.OffsetX, z.OffsetY))
 	z.Image.Refresh()
+
 }
 
 func (z *ZoomableImage) Zoom(dz float32) {
@@ -48,11 +51,9 @@ func (z *ZoomableImage) Zoom(dz float32) {
 	postScale := z.Scale
 	deltaScale := postScale - prevScale
 
-	// Calculate the current position of the image center
 	imageCenterX := (float32(z.Image.Size().Width) / 2) - z.OffsetX
 	imageCenterY := (float32(z.Image.Size().Height) / 2) - z.OffsetY
 
-	// Adjust offsets based on the scale change and the viewport center
 	z.OffsetX -= deltaScale * imageCenterX
 	z.OffsetY -= deltaScale * imageCenterY
 

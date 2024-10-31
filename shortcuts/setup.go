@@ -78,6 +78,9 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			settingsWindow := views.Settings(a)
 			settingsWindow.Show()
 		}
+		if e.Name == "R" {
+			is.Zoomable.Reset()
+		}
 		if e.Name == "K" {
 			is.Zoomable.Move(0, -10)
 		}
