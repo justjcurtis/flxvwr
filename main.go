@@ -1,10 +1,10 @@
 package main
 
 import (
-	"flxvwr/services"
-	"flxvwr/shortcuts"
-	"flxvwr/utils"
-	"flxvwr/views"
+	"github.com/justjcurtis/flxvwr/services"
+	"github.com/justjcurtis/flxvwr/shortcuts"
+	"github.com/justjcurtis/flxvwr/utils"
+	"github.com/justjcurtis/flxvwr/views"
 	"log"
 	"time"
 

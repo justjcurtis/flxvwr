@@ -1,10 +1,10 @@
 package shortcuts
 
 import (
-	"flxvwr/services"
-	"flxvwr/utils"
-	"flxvwr/views"
 	"fmt"
+	"github.com/justjcurtis/flxvwr/services"
+	"github.com/justjcurtis/flxvwr/utils"
+	"github.com/justjcurtis/flxvwr/views"
 	"strconv"
 	"time"
 

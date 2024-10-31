@@ -1,4 +1,4 @@
-module github.com/justjcurtis/flxvwr 
+module github.com/justjcurtis/flxvwr
 
 go 1.22.1
 

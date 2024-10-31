@@ -1,8 +1,8 @@
 package services
 
 import (
-	"flxvwr/models"
-	"flxvwr/utils"
+	"github.com/justjcurtis/flxvwr/models"
+	"github.com/justjcurtis/flxvwr/utils"
 	"image"
 	"image/color"
 	"math"
