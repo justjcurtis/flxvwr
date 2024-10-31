@@ -21,29 +21,25 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 
 ## Installation
 
-1. **Clone this repository**:
-   ```bash
-   git clone https://github.com/justjcurtis/flxvwr.git
-   cd flxvwr
-   ```
-   or
-   ```bash
-   git clone git@github.com:justjcurtis/flxvwr.git
-   cd flxvwr
-   ```
+1. **Get Go**:
 
-2. **Install the dependencies**:
+    Go [here](https://go.dev/doc/install) to install Go.
+
+2. **Ensure Go paths are set**:
+    Add the following to your `.bashrc` or `.zshrc`:
     ```bash
-    go mod tidy
+    export GOPATH=$HOME/go
+    export PATH=$PATH:$GOPATH/bin
     ```
 
-3. **Run the application (optional)**:
+3. **Install flxvwr**:
+    ```bash
+    go install github.com/justjcurtis/flxvwr
+    ```
+
+4. **Run the application (optional)**:
    ```bash
-   go run .
-   ```
-4. **Install the application**:
-   ```bash
-   go install .
+   flxvwr
    ```
 
 ## Usage
