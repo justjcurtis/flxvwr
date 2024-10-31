@@ -7,6 +7,9 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/spf13/viper v1.19.0
 )
+retract (
+	v0.0.0 // published accidentally
+)
 
 require (
 	fyne.io/systray v1.11.0 // indirect
