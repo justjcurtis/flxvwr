@@ -3,6 +3,7 @@ package shortcuts
 import (
 	"flxvwr/services"
 	"flxvwr/views"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -10,18 +11,75 @@ import (
 	"github.com/spf13/viper"
 )
 
+var keypressThreshold = 500 * time.Millisecond
+
+type modifiers struct {
+	super bool
+	ctrl  bool
+	shift bool
+	alt   bool
+}
+
+func (m *modifiers) reset() {
+	m.super = false
+	m.ctrl = false
+	m.shift = false
+	m.alt = false
+}
+func (m *modifiers) getMods() string {
+	mods := ""
+	if m.super {
+		mods += "Super+"
+	}
+	if m.ctrl {
+		mods += "Ctrl+"
+	}
+	if m.shift {
+		mods += "Shift+"
+	}
+	if m.alt {
+		mods += "Alt+"
+	}
+	return mods
+}
+
 func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *services.PlayerService, ns *services.NotificationService) {
+	mods := modifiers{}
+	lastKeyTime := time.Now().Add(-keypressThreshold * 2)
 	w.Canvas().SetOnTypedKey(func(e *fyne.KeyEvent) {
-		if e.Name == "Escape" || e.Name == "Q" {
+		if time.Since(lastKeyTime) > keypressThreshold {
+			mods.reset()
+		}
+		lastKeyTime = time.Now()
+		if e.Name == "SuperLeft" || e.Name == "SuperRight" {
+			mods.super = true
+			return
+		}
+		if e.Name == "ControlLeft" || e.Name == "ControlRight" {
+			mods.ctrl = true
+			return
+		}
+		if e.Name == "LeftShift" || e.Name == "RightShift" {
+			mods.shift = true
+			return
+		}
+		if e.Name == "AltLeft" || e.Name == "AltRight" {
+			mods.alt = true
+			return
+		}
+
+		input := mods.getMods() + fmt.Sprint(e.Name)
+
+		if input == "Escape" || input == "Q" {
 			a.Quit()
 		}
-		if e.Name == "C" {
+		if input == "C" {
 			ns.SetNotification("Cleared")
 			ps.Stop()
 			is.Clear()
 			w.SetContent(views.StartView(a))
 		}
-		if e.Name == "Right" {
+		if input == "Right" {
 			isPlaying := ps.IsPlaying
 			ps.Stop()
 			is.Next()
@@ -31,7 +89,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 				ps.PlayPause()
 			}
 		}
-		if e.Name == "Left" {
+		if input == "Left" {
 			isPlaying := ps.IsPlaying
 			ps.Stop()
 			is.Previous()
@@ -41,7 +99,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 				ps.PlayPause()
 			}
 		}
-		if e.Name == "Space" {
+		if input == "Space" {
 			if ps.IsPlaying {
 				ns.SetNotification("Paused")
 			} else {
@@ -49,7 +107,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			}
 			ps.PlayPause()
 		}
-		if e.Name == "S" {
+		if input == "S" {
 			shuffle := viper.GetBool("shuffle")
 			viper.Set("shuffle", !shuffle)
 			if !shuffle {
@@ -59,13 +117,13 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			}
 			is.RecalculatePlaylist()
 		}
-		if e.Name == "Up" {
+		if input == "Up" {
 			nextDelay := viper.GetFloat64("delay") + 0.5
 			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			viper.Set("delay", nextDelay)
 			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
 		}
-		if e.Name == "Down" {
+		if input == "Down" {
 			nextDelay := viper.GetFloat64("delay") - 0.5
 			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			if nextDelay < 1 {
@@ -74,50 +132,70 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			viper.Set("delay", nextDelay)
 			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
 		}
-		if e.Name == "/" {
+		if input == "/" {
 			settingsWindow := views.Settings(a)
 			settingsWindow.Show()
 		}
-		if e.Name == "R" {
+		if input == "R" {
 			is.Zoomable.Reset()
 			is.Brightness = 1
 			is.Contrast = 1
 			is.Update(w, ps, false)
 		}
-		if e.Name == "K" {
+		if input == "K" {
 			is.Zoomable.Move(0, 10)
 		}
-		if e.Name == "H" {
+		if input == "H" {
 			is.Zoomable.Move(10, 0)
 		}
-		if e.Name == "J" {
+		if input == "J" {
 			is.Zoomable.Move(0, -10)
 		}
-		if e.Name == "L" {
+		if input == "L" {
 			is.Zoomable.Move(-10, 0)
 		}
-		if e.Name == "=" || e.Name == "+" {
+		if input == "=" || input == "+" {
 			is.Zoomable.Zoom(0.2)
 		}
-		if e.Name == "-" || e.Name == "_" {
+		if input == "-" || input == "_" {
 			is.Zoomable.Zoom(-0.2)
 		}
-		if e.Name == "B" {
+		if input == "B" {
+			is.Brightness -= 0.05
+			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
+			is.Update(w, ps, false)
+		}
+		if input == "Shift+B" {
 			is.Brightness -= 0.01
 			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
 		}
-		if e.Name == "N" {
+		if input == "N" {
+			is.Brightness += 0.05
+			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
+			is.Update(w, ps, false)
+		}
+		if input == "Shift+N" {
 			is.Brightness += 0.01
 			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
 		}
-		if e.Name == "V" {
+		if input == "V" {
+			is.Contrast -= 0.05
+			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
+			is.Update(w, ps, false)
+		}
+		if input == "Shift+V" {
 			is.Contrast -= 0.01
 			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
 		}
-		if e.Name == "M" {
+		if input == "M" {
+			is.Contrast += 0.05
+			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
+			is.Update(w, ps, false)
+		}
+		if input == "Shift+M" {
 			is.Contrast += 0.01
 			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
 			is.Update(w, ps, false)
