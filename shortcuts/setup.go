@@ -1,0 +1,83 @@
+package shortcuts
+
+import (
+	"flxvwr/services"
+	"flxvwr/views"
+	"strconv"
+	"time"
+
+	"fyne.io/fyne/v2"
+	"github.com/spf13/viper"
+)
+
+func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *services.PlayerService, ns *services.NotificationService) {
+	w.Canvas().SetOnTypedKey(func(e *fyne.KeyEvent) {
+		if e.Name == "Escape" || e.Name == "Q" {
+			a.Quit()
+		}
+		if e.Name == "C" {
+			ns.SetNotification("Cleared")
+			ps.Stop()
+			is.Clear()
+			w.SetContent(views.StartView(a))
+		}
+		if e.Name == "Right" {
+			isPlaying := ps.IsPlaying
+			ps.Stop()
+			is.Next()
+			is.Update(w, ps)
+			ps.PlayPause()
+			if !isPlaying {
+				ps.PlayPause()
+			}
+			ps.LastSet = ps.LastSet.Add(-ps.CurrentDelay)
+		}
+		if e.Name == "Left" {
+			isPlaying := ps.IsPlaying
+			ps.Stop()
+			is.Previous()
+			is.Update(w, ps)
+			ps.PlayPause()
+			if !isPlaying {
+				ps.PlayPause()
+			}
+		}
+		if e.Name == "Space" {
+			if ps.IsPlaying {
+				ns.SetNotification("Paused")
+			} else {
+				ns.SetNotification("Playing")
+			}
+			ps.PlayPause()
+		}
+		if e.Name == "S" {
+			shuffle := viper.GetBool("shuffle")
+			viper.Set("shuffle", !shuffle)
+			if !shuffle {
+				ns.SetNotification("Shuffle On")
+			} else {
+				ns.SetNotification("Shuffle Off")
+			}
+			is.RecalculatePlaylist()
+		}
+		if e.Name == "Up" {
+			nextDelay := viper.GetFloat64("delay") + 0.5
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
+			viper.Set("delay", nextDelay)
+			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+		}
+		if e.Name == "Down" {
+			nextDelay := viper.GetFloat64("delay") - 0.5
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
+			if nextDelay < 1 {
+				nextDelay = 1
+			}
+			viper.Set("delay", nextDelay)
+			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+		}
+		if e.Name == "/" {
+			settingsWindow := views.Settings(a)
+			settingsWindow.Show()
+		}
+	})
+}
