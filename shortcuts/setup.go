@@ -2,6 +2,7 @@ package shortcuts
 
 import (
 	"flxvwr/services"
+	"flxvwr/utils"
 	"flxvwr/views"
 	"fmt"
 	"strconv"
@@ -70,7 +71,11 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 
 		input := mods.getMods() + fmt.Sprint(e.Name)
 
-		if input == "Escape" || input == "Q" {
+		if input == "Escape" {
+			utils.KillAppInstances("flxvwr")
+			a.Quit()
+		}
+		if input == "Q" {
 			a.Quit()
 		}
 		if input == "C" {

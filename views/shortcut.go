@@ -9,7 +9,8 @@ import (
 )
 
 var ShortcutMap [][]string = [][]string{
-	{"Quit", "Q/Escape"},
+	{"Quit", "Q"},
+	{"Quit All", "Esc"},
 	{"Clear", "C"},
 	{"Play/Pause", "Space"},
 	{"Prev/Next", "Left/Right"},
