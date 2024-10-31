@@ -37,7 +37,7 @@ This project is a simple, cross-platform image viewer written in Go using the [F
     go install github.com/justjcurtis/flxvwr
     ```
 
-4. **Run the application (optional)**:
+4. **Run the application**
    ```bash
    flxvwr
    ```
