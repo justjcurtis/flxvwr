@@ -198,6 +198,12 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 		if input == "Shift+-" || input == "Shift+_" {
 			is.Zoomable.Zoom(-0.2)
 		}
+		if input == "[" {
+			is.Rotate(w, 3)
+		}
+		if input == "]" {
+			is.Rotate(w, 1)
+		}
 		if input == "B" {
 			is.Brightness -= 0.05
 			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")

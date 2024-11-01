@@ -200,3 +200,53 @@ func (is *ImageService) AdjustBrightnessAndContrast(img image.Image) image.Image
 	}
 	return adjusted
 }
+
+func (is *ImageService) Rotate(w fyne.Window, direction int) {
+	if is.Zoomable == nil {
+		return
+	}
+	img := is.Zoomable.Image.Image
+	bounds := img.Bounds()
+	var rotated *image.RGBA
+
+	switch direction % 4 {
+	case 1:
+		rotated = image.NewRGBA(image.Rect(0, 0, bounds.Dy(), bounds.Dx()))
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				rotated.Set(bounds.Max.Y-y-1, x, img.At(x, y))
+			}
+		}
+	case 2:
+		rotated = image.NewRGBA(image.Rect(0, 0, bounds.Dx(), bounds.Dy()))
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				rotated.Set(bounds.Max.X-x-1, bounds.Max.Y-y-1, img.At(x, y))
+			}
+		}
+	case 3:
+		rotated = image.NewRGBA(image.Rect(0, 0, bounds.Dy(), bounds.Dx()))
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				rotated.Set(y, bounds.Max.X-x-1, img.At(x, y))
+			}
+		}
+	default:
+		return
+	}
+
+	is.Zoomable.Image.Image = rotated
+	is.Zoomable.Scale = 1.0
+	is.Zoomable.OffsetX = 0.0
+	is.Zoomable.OffsetY = 0.0
+	is.Zoomable.Image.Resize(fyne.NewSize(float32(rotated.Bounds().Max.X), float32(rotated.Bounds().Max.Y)))
+	is.Zoomable.Refresh()
+	imgContainer := container.NewWithoutLayout(is.Zoomable.Image)
+	width := w.Canvas().Size().Width
+	height := w.Canvas().Size().Height
+	imgContainer.Resize(fyne.NewSize(width, height))
+	is.Zoomable.Image.Resize(imgContainer.Size())
+	imgContainer.Move(fyne.NewPos(0, 0))
+	container.NewStack(imgContainer)
+	w.SetContent(imgContainer)
+}

@@ -50,7 +50,6 @@ Launch the application, drag&drop images or directories into the window, and sta
 
 - **Zoom & Pan**: Fixes for keeping the image centered when zooming in/out are needed.
 - **Customisable Key Bindings**: Allow users to customise key bindings for navigation and controls.
-- **Image Rotation**: Add support for rotating images.
 - **Image Metadata**: Display image metadata such as resolution, file size, and format.
 - **Image Sorting**: Sort images by name, date, or size.
 - **Image Filtering**: Filter images by file type or resolution.
