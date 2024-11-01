@@ -57,7 +57,7 @@ Launch the application, drag&drop images or directories into the window, and sta
 - **Plugins**: Add support for Lua plugins to extend the application's functionality.
     - **Package Manager**: Implement a package manager for installing and managing plugins.
 - **Thumbnail View**: Display a grid of image thumbnails for quicker navigation.
-- **Unit Tests**: Write tests to ensure the application functions as expected.
+- **UI Tests**: Write tests to ensure the application functions as expected.
 
 ## Contributing
 
