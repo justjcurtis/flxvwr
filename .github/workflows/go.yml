@@ -1,0 +1,50 @@
+name: Go Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    name: Build, Test, and Release Binaries
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        goarch: [amd64, arm64]
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4.2.2
+
+    - name: Set up Go
+      uses: actions/setup-go@v5.1.0
+      with:
+        go-version: 1.20
+
+    - name: Run Tests
+      run: go test -v ./...
+
+    - name: Build Binary
+      run: |
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.goarch }} go build -o flxvwr
+      shell: bash
+
+    - name: Archive Binaries
+      run: |
+        zip -r flxvwr-${{ matrix.os }}-${{ matrix.goarch }}.zip flxvwr
+      shell: bash
+      
+    - name: Release to GitHub
+      uses: softprops/action-gh-release@v2.0.9
+      with:
+        make_latest: true
+        files: flxvwr-${{ matrix.os }}-${{ matrix.goarch }}.zip
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
