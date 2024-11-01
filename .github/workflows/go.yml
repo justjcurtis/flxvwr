@@ -41,19 +41,19 @@ jobs:
 
     - name: Build Binary
       run: |
-        GOOS=${{ matrix.os }} GOARCH=${{ matrix.goarch }} go build -o flxvwr
+        GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o flxvwr
       shell: bash
 
     - name: Archive Binaries
       run: |
-        zip -r flxvwr-${{ matrix.os }}-${{ matrix.goarch }}.zip flxvwr
+        zip -r flxvwr-${{ matrix.os }}-${{ matrix.arch }}.zip flxvwr
       shell: bash
       
     - name: Release to GitHub
       uses: softprops/action-gh-release@v2.0.9
       with:
         make_latest: true
-        files: flxvwr-${{ matrix.os }}-${{ matrix.goarch }}.zip
+        files: flxvwr-${{ matrix.os }}-${{ matrix.arch }}.zip
         tag_name: ${{ github.ref_name }}
         name: Release ${{ github.ref_name }}
       env:
