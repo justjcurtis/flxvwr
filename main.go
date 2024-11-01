@@ -19,7 +19,10 @@ var PlayerService *services.PlayerService
 var NotificationService *services.NotificationService
 
 func main() {
-	configPath := utils.GetConfigPath()
+	configPath, err := utils.GetConfigPath()
+	if err != nil {
+		log.Fatal(err)
+	}
 	viper.AddConfigPath(configPath)
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
