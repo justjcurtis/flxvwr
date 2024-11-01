@@ -2,8 +2,6 @@ name: Go Build and Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*.*.*'
 
@@ -26,7 +24,7 @@ jobs:
       with:
         go-version: 1.22.1
 
-    - name: Install dependencies (Linux only)
+    - name: Install dependencies
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
