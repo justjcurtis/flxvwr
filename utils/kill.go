@@ -3,22 +3,30 @@ package utils
 import (
 	"fmt"
 	"os/exec"
-	"runtime"
 )
 
-func KillAppInstances(appName string) error {
-	var cmd *exec.Cmd
-
-	switch runtime.GOOS {
-	case "linux", "darwin":
-		cmd = exec.Command("pkill", appName)
-	case "windows":
-		cmd = exec.Command("taskkill", "/IM", appName+".exe", "/F")
-	default:
-		return fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+var execCommand = func(command string, args ...string) error {
+	cmd := exec.Command(command, args...)
+	if err := cmd.Run(); err != nil {
+		return err
 	}
 
-	if err := cmd.Run(); err != nil {
+	return nil
+}
+
+func KillAppInstances(appName string) error {
+	var err error
+	currentOS := getOS()
+	switch currentOS {
+	case "linux", "darwin":
+		err = execCommand("pkill", appName)
+	case "windows":
+		err = execCommand("taskkill", "/IM", appName+".exe", "/F")
+	default:
+		return fmt.Errorf("unsupported platform: %s", currentOS)
+	}
+
+	if err != nil {
 		return err
 	}
 
