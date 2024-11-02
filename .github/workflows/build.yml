@@ -19,11 +19,5 @@ jobs:
         with:
           go-version: 1.22.1
 
-      - name: Install fyne-cross
-        run: go install github.com/fyne-io/fyne-cross@latest
-
-      - name: Setup Docker
-        uses: docker-practice/actions-setup-docker@v1
-
       - name: Build for linux
-        run: fyne-cross linux -arch=amd64 . -o flxvwr-linux-x64
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build . -o flxvwr-darwin-x64
