@@ -15,16 +15,23 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 |---------------------------------------------|---------------------------------------------|---------------------------------------------|
 | Welcome Screen                              | Image Screen                                | Settings Screen                             |
 
-
 ## Keyboard Shortcuts
 
-- **Q/Esc**: Quit the application
+- **Q**: Quit the application
+- **Esc**: Quit all instances of the application
 - **C**: Clear the current playlist
 - **Space**: Play/Pause the current playlist
-- **Left/Right Arrow**: Prev/Next image
-- **Up/Down Arrow**: Delay +/- 0.5s
+- **Left/Right Arrow**: Go to the previous/next item
+- **Up/Down Arrow**: Adjust delay by +/- 1 second
 - **S**: Toggle shuffle mode
-- **/**: Show settings
+- **+/-**: Zoom in/out
+- **H/L/J/K**: Pan left/right/up/down
+- **[ / ]**: Rotate image
+- **R**: Reset image
+- **B/N**: Adjust brightness up/down
+- **V/M**: Adjust contrast up/down
+- **Shift+...**: Smaller increments for adjustments and movements
+- **/**: Open settings
 
 ## Installation
 
