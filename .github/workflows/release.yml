@@ -14,10 +14,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Install go, gcc
+      - name: Install deps
         shell: bash
         run: |
-          pacman -Syu --noconfirm go gcc
+          pacman -Syu --noconfirm go gcc xorg-server-devel libxcursor libxrandr libxinerama libxi
 
       - name: Build for linux
         run: go build -ldflags="-s -w" . -o flxvwr-linux-x64
