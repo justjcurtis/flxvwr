@@ -27,7 +27,6 @@ jobs:
       - name: Run tests
         run: go test ./...
 
-
   build-darwin:
     runs-on: macos-latest
     steps:
@@ -39,9 +38,6 @@ jobs:
         with:
           go-version: 1.22.1
 
-      - name: Build for darwin (Intel)
-        run: GOARCH=amd64 go build -o flxvwr-darwin-x64 .
-      
       - name: Build for darwin (Apple Silicon)
         run: GOARCH=arm64 go build -o flxvwr-darwin-arm64 .
 
@@ -60,7 +56,6 @@ jobs:
           name: Release ${{ github.ref_name }}
           files: |
               flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
-              flxvwr-darwin-x64-${{ github.ref_name }}.tar.gz
               flxvwr-darwin-arm64-${{ github.ref_name }}.tar.gz
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
