@@ -28,12 +28,56 @@ jobs:
       - name: Run tests
         run: go test -v ./...
 
+  build-darwin-arm:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@v5.1.0
+        with:
+          go-version: 1.22.1
+
+      - name: Install fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Download Icon
+        run: curl -o icon.png https://i.ibb.co/RNpWkb6/flxvwr.png
+
+      - name: Build for darwin (Apple Silicon)
+        run: |
+          GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr-arm64
+          mkdir -p build/arm64
+          mv flxvwr-arm64 build/arm64/flxvwr.app
+
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Create DMG for arm64
+        run: |
+          create-dmg \
+            --volname "flxvwr Installer (arm64)" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --app-drop-link 400 150 \
+            "build/arm64/flxvwr.app" \
+            build/arm64
+          mv build/arm64/flxvwr.dmg flxvwr-darwin-arm64.dmg
+
+      - name: Upload arm64 DMG Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flxvwr-darwin-arm64.dmg
+          path: flxvwr-darwin-arm64.dmg
+
   build-darwin-x64:
     runs-on: macos-13
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
-        
+
       - name: Set up Go
         uses: actions/setup-go@v5.1.0
         with:
@@ -45,8 +89,29 @@ jobs:
       - name: Download Icon
         run: curl -o icon.png https://i.ibb.co/RNpWkb6/flxvwr.png
 
-      - name: Build for darwin (intel)
-        run: GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr-darwin-amd64
+      - name: Build for darwin (Intel)
+        run: |
+          GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr-x64
+          mkdir -p build/x64
+          mv flxvwr-x64 build/x64/flxvwr.app
 
-      - name: Run tests
-        run: go test -v ./...
+      - name: Install create-dmg
+        run: brew install create-dmg
+
+      - name: Create DMG for x64
+        run: |
+          create-dmg \
+            --volname "flxvwr Installer (x64)" \
+            --window-pos 200 120 \
+            --window-size 600 400 \
+            --icon-size 100 \
+            --app-drop-link 400 150 \
+            "build/x64/flxvwr.app" \
+            build/x64
+          mv build/x64/flxvwr.dmg flxvwr-darwin-x64.dmg
+
+      - name: Upload x64 DMG Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flxvwr-darwin-x64.dmg
+          path: flxvwr-darwin-x64.dmg
