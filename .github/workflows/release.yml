@@ -39,10 +39,6 @@ jobs:
         with:
           go-version: 1.22.1
 
-      - name: Install deps
-        shell: bash
-        run: sudo xcode-select --install
-
       - name: Build for darwin (Intel)
         run: GOARCH=amd64 go build -o flxvwr-darwin-x64 .
       
@@ -57,14 +53,14 @@ jobs:
     needs: [build-linux, build-darwin]
     steps:
       - name: Upload assets
-      uses: softprops/action-gh-release@vv2.0.9
-      with:
-        make_latest: true
-        tag_name: ${{ github.ref_name }}
-        name: Release ${{ github.ref_name }}
-        files: |
-            flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
-            flxvwr-darwin-x64-${{ github.ref_name }}.tar.gz
-            flxvwr-darwin-arm64-${{ github.ref_name }}.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@vv2.0.9
+        with:
+          make_latest: true
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+              flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
+              flxvwr-darwin-x64-${{ github.ref_name }}.tar.gz
+              flxvwr-darwin-arm64-${{ github.ref_name }}.tar.gz
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
