@@ -64,13 +64,12 @@ jobs:
             --app-drop-link 400 150 \
             "build/arm64/flxvwr-arm64.dmg" \
             "build/arm64/flxvwr.app" \
-          mv build/arm64/flxvwr.dmg flxvwr-darwin-arm64.dmg
 
       - name: Upload arm64 DMG Artifact
         uses: actions/upload-artifact@v3
         with:
           name: flxvwr-darwin-arm64.dmg
-          path: flxvwr-darwin-arm64.dmg
+          path: build/arm64/flxvwr-arm64.dmg
 
   build-darwin-x64:
     runs-on: macos-13
@@ -108,10 +107,9 @@ jobs:
             --app-drop-link 400 150 \
             "build/x64/flxvwr-x64.dmg" \
             "build/x64/flxvwr.app" \
-          mv build/x64/flxvwr.dmg flxvwr-darwin-x64.dmg
 
       - name: Upload x64 DMG Artifact
         uses: actions/upload-artifact@v3
         with:
           name: flxvwr-darwin-x64.dmg
-          path: flxvwr-darwin-x64.dmg
+          path: build/x64/flxvwr-darwin-x64.dmg
