@@ -48,11 +48,10 @@ jobs:
       - name: Build for Windows
         run: |
           mkdir -p build/windows
-          GOARCH=amd64 fyne package -os windows -icon icon.png -name flxvwr
-          mv flxvwr.exe build/windows/flxvwr.exe
+          fyne package -os windows -icon icon.png -name flxvwr
   
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flxvwr-windows.exe
-          path: build/windows/flxvwr.exe
+          name: flxvwr.exe
+          path: flxvwr.exe
