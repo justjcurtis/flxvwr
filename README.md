@@ -9,6 +9,13 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 - **Keyboard Shortcuts**: Navigate through images and control the viewer with intuitive key bindings.
 - **Responsive**: Built with Fyne, enabling a responsive and native look on all platforms.
 
+## Screenshots
+
+| [![Welcome Screen](https://i.ibb.co/H78vt6f/welcome.png)](https://ibb.co/jhXKymP) | [![Feature Screen](https://i.ibb.co/0s1hXYV/image.png)](https://ibb.co/jJqg53Z) | [![Settings Screen](https://i.ibb.co/JkkgQ4G/settings.png)](https://ibb.co/vzzRYGT) |
+|---------------------------------------------|---------------------------------------------|---------------------------------------------|
+| Welcome Screen                              | Image Screen                                | Settings Screen                             |
+
+
 ## Keyboard Shortcuts
 
 - **Q/Esc**: Quit the application
