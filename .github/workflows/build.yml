@@ -27,8 +27,9 @@ jobs:
 
       - name: Run tests
         run: go test -v ./...
-  build-darwin-arm:
-    runs-on: macos-latest
+
+  build-darwin-x64:
+    runs-on: macos-13
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
@@ -44,8 +45,8 @@ jobs:
       - name: Download Icon
         run: curl -o icon.png https://i.ibb.co/RNpWkb6/flxvwr.png
 
-      - name: Build for darwin (Apple Silicon)
-        run: GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr-darwin-arm64
+      - name: Build for darwin (intel)
+        run: GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr-darwin-amd64
 
       - name: Run tests
         run: go test -v ./...
