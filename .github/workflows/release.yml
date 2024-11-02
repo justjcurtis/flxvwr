@@ -6,49 +6,65 @@ on:
       - 'v*.*.*'
 
 jobs:
-  release:
-    runs-on: macos-latest
+  build-linux:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
-
+        
       - name: Set up Go
         uses: actions/setup-go@v5.1.0
         with:
           go-version: 1.22.1
 
-      - name: Install fyne-cross
-        run: go install github.com/fyne-io/fyne-cross@latest
+      - name: Install deps
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install gcc libgl1-mesa-dev xorg-dev
 
       - name: Build for linux
-        run: fyne-cross linux -arch=amd64 . -o flxvwr-linux-x64
+        run: go build -o flxvwr-darwin-x64 .
 
-      - name: Build for OSX (Intel)
-        shell: bash
-        run: fyne-cross darwin -arch=amd64 . -o flxvwr-darwin-x64
+      - name: Run tests
+        run: go test ./...
 
-      - name: Build for OSX (Apple Silicon)
-        shell: bash
-        run: fyne-cross darwin -arch=arm64 . -o flxvwr-darwin-arm64
 
-      - name: Package for linux
-        run: tar -cvzf flxvwr-linux-x64-${{ github.ref_name }}.tar.gz flxvwr-linux-x64
-
-      - name: Package for OSX (Intel)
-        run: zip -r flxvwr-linux-x64-${{ github.ref_name }}.zip flxvwr-darwin-x64
-
-      - name: Package for OSX (Apple Silicon)
-        run: zip -r flxvwr-linux-arm64-${{ github.ref_name }}.zip flxvwr-darwin-arm64
-
-      - name: Upload assets
-        uses: softprops/action-gh-release@vv2.0.9
+  build-darwin:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        
+      - name: Set up Go
+        uses: actions/setup-go@v5.1.0
         with:
-          make_latest: true
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          files: |
-              flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
-              flxvwr-darwin-x64-${{ github.ref_name }}.tar.gz
-              flxvwr-darwin-arm64-${{ github.ref_name }}.tar.gz
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          go-version: 1.22.1
+
+      - name: Install deps
+        shell: bash
+        run: sudo xcode-select --install
+
+      - name: Build for darwin (Intel)
+        run: GOARCH=amd64 go build -o flxvwr-darwin-x64 .
+      
+      - name: Build for darwin (Apple Silicon)
+        run: GOARCH=arm64 go build -o flxvwr-darwin-arm64 .
+
+      - name: Run tests
+        run: go test ./...
+  
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-linux, build-darwin]
+    steps:
+      - name: Upload assets
+      uses: softprops/action-gh-release@vv2.0.9
+      with:
+        make_latest: true
+        tag_name: ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
+        files: |
+            flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
+            flxvwr-darwin-x64-${{ github.ref_name }}.tar.gz
+            flxvwr-darwin-arm64-${{ github.ref_name }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
