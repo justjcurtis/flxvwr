@@ -48,7 +48,7 @@ jobs:
       - name: Build for Windows
         run: |
           mkdir -p build/windows
-          GOOS=windows GOARCH=amd64 fyne package -os windows -icon icon.png -name flxvwr
+          GOARCH=amd64 fyne package -os windows -icon icon.png -name flxvwr
           mv flxvwr.exe build/windows/flxvwr.exe
   
       - name: Upload Windows Artifact
