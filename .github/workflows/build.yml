@@ -8,18 +8,19 @@ on:
     branches: [ main ]
 
 jobs:
-
   build:
-    runs-on: ubuntu-latest
-    container:
-      image: archlinux/archlinux:latest
+    runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
-    
-    - name: Install deps
-      shell: bash
-      run: |
-        pacman -Syu --noconfirm go gcc xorg-server-devel libxcursor libxrandr libxinerama libxi
-        
-    - name: Build
-      run: go build -v ./...
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@v5.1.0
+        with:
+          go-version: 1.22.1
+
+      - name: Install fyne-cross
+        run: go install github.com/fyne-io/fyne-cross@latest
+
+      - name: Build for linux
+        run: fyne-cross linux -arch=amd64 . -o flxvwr-linux-x64

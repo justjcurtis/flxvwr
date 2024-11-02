@@ -7,28 +7,29 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
-    container:
-      image: archlinux/archlinux:latest
+    runs-on: macos-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4.2.2
 
-      - name: Install deps
-        shell: bash
-        run: |
-          pacman -Syu --noconfirm go gcc xorg-server-devel libxcursor libxrandr libxinerama libxi
+      - name: Set up Go
+        uses: actions/setup-go@v5.1.0
+        with:
+          go-version: 1.22.1
+
+      - name: Install fyne-cross
+        run: go install github.com/fyne-io/fyne-cross@latest
 
       - name: Build for linux
-        run: go build -ldflags="-s -w" . -o flxvwr-linux-x64
+        run: fyne-cross linux -arch=amd64 . -o flxvwr-linux-x64
 
       - name: Build for OSX (Intel)
         shell: bash
-        run: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" . -o flxvwr-darwin-x64
+        run: fyne-cross darwin -arch=amd64 . -o flxvwr-darwin-x64
 
       - name: Build for OSX (Apple Silicon)
         shell: bash
-        run: GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" . -o flxvwr-darwin-arm64
+        run: fyne-cross darwin -arch=arm64 . -o flxvwr-darwin-arm64
 
       - name: Package for linux
         run: tar -cvzf flxvwr-linux-x64-${{ github.ref_name }}.tar.gz flxvwr-linux-x64
