@@ -1,4 +1,7 @@
-# flxvwr
+# <img src="https://i.ibb.co/RNpWkb6/flxvwr.png" alt="logo" width="40" style="vertical-align: middle;"/> flxvwr
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/justjcurtis/flxvwr)](https://goreportcard.com/report/github.com/justjcurtis/flxvwr)
+[![License](https://img.shields.io/github/license/justjcurtis/flxvwr)](https://github.com/justjcurtis/flxvwr/blob/main/Licence.md)
 
 This project is a simple, cross-platform image viewer written in Go using the [Fyne](https://fyne.io/) toolkit. The application provides a minimal user interface, keyboard shortcuts for navigation, and smooth performance across platforms including Windows, macOS, and Linux.
 
