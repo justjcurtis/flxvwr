@@ -24,3 +24,6 @@ jobs:
 
       - name: Build for linux
         run: go build -o flxvwr-darwin-x64 .
+
+      - name: Run tests
+        run: go test ./...
