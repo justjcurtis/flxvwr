@@ -39,9 +39,6 @@ jobs:
         with:
           go-version: 1.22.1
 
-      - name: Build for darwin (Intel)
-        run: GOARCH=amd64 go build -o flxvwr-darwin-x64 .
-      
       - name: Build for darwin (Apple Silicon)
         run: GOARCH=arm64 go build -o flxvwr-darwin-arm64 .
 
