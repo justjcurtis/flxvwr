@@ -62,21 +62,21 @@ jobs:
   
       - name: Generate Inno Setup Script
         run: |
-          echo [Setup] > flxvwr.iss
-          echo AppName=flxvwr >> flxvwr.iss
-          echo AppVersion=1.0 >> flxvwr.iss
-          echo DefaultDirName={autopf}\\flxvwr >> flxvwr.iss
-          echo DefaultGroupName=flxvwr >> flxvwr.iss
-          echo OutputDir=build/windows >> flxvwr.iss
-          echo OutputBaseFilename=flxvwr_installer >> flxvwr.iss
-          echo SetupIconFile=icon.png >> flxvwr.iss
-          echo [Files] >> flxvwr.iss
-          echo Source: "build/windows/flxvwr.exe"; DestDir: "{app}"; Flags: ignoreversion >> flxvwr.iss
-          echo [Icons] >> flxvwr.iss
-          echo Name: "{group}\\flxvwr"; Filename: "{app}\\flxvwr.exe" >> flxvwr.iss
-          echo Name: "{commondesktop}\\flxvwr"; Filename: "{app}\\flxvwr.exe"; Tasks: desktopicon >> flxvwr.iss
-          echo [Tasks] >> flxvwr.iss
-          echo Name: "desktopicon"; Description: "Create a &Desktop shortcut"; GroupDescription: "Additional icons:" >> flxvwr.iss
+          Write-Output "[Setup]" | Out-File -FilePath flxvwr.iss -Encoding UTF8
+          Add-Content -Path flxvwr.iss -Value "AppName=flxvwr"
+          Add-Content -Path flxvwr.iss -Value "AppVersion=1.0"
+          Add-Content -Path flxvwr.iss -Value "DefaultDirName={autopf}\flxvwr"
+          Add-Content -Path flxvwr.iss -Value "DefaultGroupName=flxvwr"
+          Add-Content -Path flxvwr.iss -Value "OutputDir=build/windows"
+          Add-Content -Path flxvwr.iss -Value "OutputBaseFilename=flxvwr_installer"
+          Add-Content -Path flxvwr.iss -Value "SetupIconFile=icon.png"
+          Add-Content -Path flxvwr.iss -Value "[Files]"
+          Add-Content -Path flxvwr.iss -Value 'Source: "build/windows/flxvwr.exe"; DestDir: "{app}"; Flags: ignoreversion'
+          Add-Content -Path flxvwr.iss -Value "[Icons]"
+          Add-Content -Path flxvwr.iss -Value 'Name: "{group}\flxvwr"; Filename: "{app}\flxvwr.exe"'
+          Add-Content -Path flxvwr.iss -Value 'Name: "{commondesktop}\flxvwr"; Filename: "{app}\flxvwr.exe"; Tasks: desktopicon'
+          Add-Content -Path flxvwr.iss -Value "[Tasks]"
+          Add-Content -Path flxvwr.iss -Value 'Name: "desktopicon"; Description: "Create a &Desktop shortcut"; GroupDescription: "Additional icons:"'
   
       - name: Build Windows Installer
         run: ISCC.exe flxvwr.iss
