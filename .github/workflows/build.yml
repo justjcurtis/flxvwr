@@ -20,7 +20,8 @@ jobs:
           go-version: 1.22.1
       
       - name: Install GCC
-        uses: egor-tensin/setup-gcc@v1
+        shell: bash
+        run: brew install gcc
 
       - name: Build for linux
         run: GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o flxvwr-darwin-x64 .
