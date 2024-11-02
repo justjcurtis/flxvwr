@@ -27,6 +27,9 @@ jobs:
       - name: Run tests
         run: go test ./...
 
+      - name: Archive
+        run: tar -czvf flxvwr-linux-x64-${{ github.ref_name }}.tar.gz flxvwr-linux-x64
+
   build-darwin:
     runs-on: macos-latest
     steps:
@@ -43,6 +46,9 @@ jobs:
 
       - name: Run tests
         run: go test ./...
+
+      - name: Archive
+        run: zip -r flxvwr-darwin-arm64-${{ github.ref_name }}.zip flxvwr-darwin-arm64
   
   release:
     runs-on: ubuntu-latest
@@ -56,6 +62,6 @@ jobs:
           name: Release ${{ github.ref_name }}
           files: |
               flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
-              flxvwr-darwin-arm64-${{ github.ref_name }}.tar.gz
+              flxvwr-darwin-arm64-${{ github.ref_name }}.zip
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
