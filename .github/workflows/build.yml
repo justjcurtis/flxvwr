@@ -45,10 +45,16 @@ jobs:
       - name: Download Icon
         run: curl -o icon.png https://i.ibb.co/RNpWkb6/flxvwr.png
   
+      - name: Install ImageMagick
+        run: choco install imagemagick -y
+  
+      - name: Convert PNG to ICO
+        run: magick convert icon.png icon.ico
+  
       - name: Build for Windows
         run: |
           mkdir -p build/windows
-          fyne package -os windows -icon icon.png -name flxvwr
+          fyne package -os windows -icon icon.ico -name flxvwr
           mv flxvwr.exe build/windows/flxvwr.exe
   
       - name: Install Inno Setup
@@ -69,7 +75,7 @@ jobs:
           Add-Content -Path flxvwr.iss -Value "DefaultGroupName=flxvwr"
           Add-Content -Path flxvwr.iss -Value "OutputDir=build/windows"
           Add-Content -Path flxvwr.iss -Value "OutputBaseFilename=flxvwr_installer"
-          Add-Content -Path flxvwr.iss -Value "SetupIconFile=icon.png"
+          Add-Content -Path flxvwr.iss -Value "SetupIconFile=icon.ico"
           Add-Content -Path flxvwr.iss -Value "[Files]"
           Add-Content -Path flxvwr.iss -Value 'Source: "build/windows/flxvwr.exe"; DestDir: "{app}"; Flags: ignoreversion'
           Add-Content -Path flxvwr.iss -Value "[Icons]"
