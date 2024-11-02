@@ -62,8 +62,8 @@ jobs:
             --window-size 600 400 \
             --icon-size 100 \
             --app-drop-link 400 150 \
+            "build/arm64/flxvwr-arm64.dmg" \
             "build/arm64/flxvwr.app" \
-            build/arm64
           mv build/arm64/flxvwr.dmg flxvwr-darwin-arm64.dmg
 
       - name: Upload arm64 DMG Artifact
@@ -106,8 +106,8 @@ jobs:
             --window-size 600 400 \
             --icon-size 100 \
             --app-drop-link 400 150 \
+            "build/x64/flxvwr-x64.dmg" \
             "build/x64/flxvwr.app" \
-            build/x64
           mv build/x64/flxvwr.dmg flxvwr-darwin-x64.dmg
 
       - name: Upload x64 DMG Artifact
