@@ -49,9 +49,13 @@ jobs:
 
       - name: Build for darwin (Apple Silicon)
         run: |
-          GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr-arm64
           mkdir -p build/arm64
-          mv flxvwr-arm64.app build/arm64/flxvwr.app
+          GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr
+          mv flxvwr.app build/arm64/flxvwr.app
+
+      - name: Ad-Hoc Code Signing for arm64
+        run: |
+          codesign --sign - --force --deep build/arm64/flxvwr.app
 
       - name: Install create-dmg
         run: brew install create-dmg
@@ -70,7 +74,7 @@ jobs:
       - name: Upload arm64 DMG Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flxvwr-arm64-${{ github.ref_name }}.dmg
+          name: flxvwr-arm64-{{ github.ref_name }}.dmg
           path: build/arm64/flxvwr-arm64.dmg
 
   build-darwin-x64:
@@ -92,9 +96,13 @@ jobs:
 
       - name: Build for darwin (Intel)
         run: |
-          GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr-x64
           mkdir -p build/x64
-          mv flxvwr-x64.app build/x64/flxvwr.app
+          GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr
+          mv flxvwr.app build/x64/flxvwr.app
+
+      - name: Ad-Hoc Code Signing for x64
+        run: |
+          codesign --sign - --force --deep build/x64/flxvwr.app
 
       - name: Install create-dmg
         run: brew install create-dmg
@@ -113,7 +121,7 @@ jobs:
       - name: Upload x64 DMG Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flxvwr-x64-${{ github.ref_name }}.dmg
+          name: flxvwr-x64-{{ github.ref_name }}.dmg
           path: build/x64/flxvwr-x64.dmg
   
   release:
