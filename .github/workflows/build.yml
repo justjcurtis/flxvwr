@@ -48,8 +48,8 @@ jobs:
       - name: Install ImageMagick
         run: choco install imagemagick -y
   
-      - name: Convert PNG to ICO
-        run: magick convert icon.png icon.ico
+      - name: Resize and Convert Icon to ICO
+        run: magick icon.png -resize 256x256 icon.ico
   
       - name: Build for Windows
         run: |
