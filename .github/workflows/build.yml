@@ -92,7 +92,7 @@ jobs:
         run: |
           GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr-x64
           mkdir -p build/x64
-          mv flxvwr-x64.app build/x6464/flxvwr.app
+          mv flxvwr-x64.app build/x64/flxvwr.app
 
       - name: Install create-dmg
         run: brew install create-dmg
