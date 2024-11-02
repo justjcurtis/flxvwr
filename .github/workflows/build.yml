@@ -22,5 +22,8 @@ jobs:
       - name: Install fyne-cross
         run: go install github.com/fyne-io/fyne-cross@latest
 
+      - name: Setup Docker
+        uses: docker-practice/actions-setup-docker@v1
+
       - name: Build for linux
         run: fyne-cross linux -arch=amd64 . -o flxvwr-linux-x64
