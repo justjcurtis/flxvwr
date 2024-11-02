@@ -55,7 +55,10 @@ jobs:
         run: |
           curl -L -o is.exe https://jrsoftware.org/download.php/is.exe
           ./is.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
-          echo "::add-path::C:\\Program Files (x86)\\Inno Setup 6"
+  
+      - name: Add Inno Setup to PATH
+        shell: bash
+        run: echo "C:\\Program Files (x86)\\Inno Setup 6" >> $GITHUB_PATH
   
       - name: Generate Inno Setup Script
         run: |
@@ -76,8 +79,7 @@ jobs:
           echo Name: "desktopicon"; Description: "Create a &Desktop shortcut"; GroupDescription: "Additional icons:" >> flxvwr.iss
   
       - name: Build Windows Installer
-        run: |
-          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" flxvwr.iss
+        run: ISCC.exe flxvwr.iss
   
       - name: Upload Windows Installer Artifact
         uses: actions/upload-artifact@v4
