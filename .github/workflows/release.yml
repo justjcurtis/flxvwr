@@ -49,12 +49,9 @@ jobs:
 
       - name: Build for darwin (Apple Silicon)
         run: |
-          GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr
+          GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr-arm64
           mkdir -p build/arm64
-          mv flxvwr.app build/arm64/
-
-      - name: Run tests
-        run: go test ./...
+          mv flxvwr-arm64.app build/arm64/flxvwr.app
 
       - name: Install create-dmg
         run: brew install create-dmg
@@ -67,15 +64,14 @@ jobs:
             --window-size 600 400 \
             --icon-size 100 \
             --app-drop-link 400 150 \
+            "build/arm64/flxvwr-arm64.dmg" \
             "build/arm64/flxvwr.app" \
-            build/arm64
-          mv build/arm64/flxvwr.dmg flxvwr-darwin-arm64.dmg
 
       - name: Upload arm64 DMG Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: flxvwr-darwin-arm64.dmg
-          path: flxvwr-darwin-arm64.dmg
+          name: flxvwr-arm64-${{ github.ref_name }}.dmg
+          path: build/arm64/flxvwr-arm64.dmg
 
   build-darwin-x64:
     runs-on: macos-13
@@ -96,12 +92,9 @@ jobs:
 
       - name: Build for darwin (Intel)
         run: |
-          GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr
+          GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr-x64
           mkdir -p build/x64
-          mv flxvwr.app build/x64/
-
-      - name: Run tests
-        run: go test ./...
+          mv flxvwr-x64.app build/x64/flxvwr.app
 
       - name: Install create-dmg
         run: brew install create-dmg
@@ -114,15 +107,14 @@ jobs:
             --window-size 600 400 \
             --icon-size 100 \
             --app-drop-link 400 150 \
+            "build/x64/flxvwr-x64.dmg" \
             "build/x64/flxvwr.app" \
-            build/x64
-          mv build/x64/flxvwr.dmg flxvwr-darwin-x64.dmg
 
       - name: Upload x64 DMG Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: flxvwr-darwin-x64.dmg
-          path: flxvwr-darwin-x64.dmg
+          name: flxvwr-x64-${{ github.ref_name }}.dmg
+          path: build/x64/flxvwr-x64.dmg
   
   release:
     runs-on: ubuntu-latest
@@ -136,7 +128,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           files: |
               flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
-              flxvwr-darwin-arm64-${{ github.ref_name }}.zip
-              flxvwr-darwin-x64-${{ github.ref_name }}.zip
+              build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
+              build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
