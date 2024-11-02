@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux/archlinux:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install go, gcc
+        shell: bash
+        run: |
+          pacman -Syu --noconfirm go gcc
+
+      - name: Build for linux
+        run: go build -ldflags="-s -w" . -o flxvwr-linux-x64
+
+      - name: Build for OSX (Intel)
+        shell: bash
+        run: GOOS=darwin GOARCH=amd64 go build -ldflags="-s -w" . -o flxvwr-darwin-x64
+
+      - name: Build for OSX (Apple Silicon)
+        shell: bash
+        run: GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" . -o flxvwr-darwin-arm64
+
+      - name: Package for linux
+        run: tar -cvzf flxvwr-linux-x64-${{ github.ref_name }}.tar.gz flxvwr-linux-x64
+
+      - name: Package for OSX (Intel)
+        run: zip -r flxvwr-linux-x64-${{ github.ref_name }}.zip flxvwr-darwin-x64
+
+      - name: Package for OSX (Apple Silicon)
+        run: zip -r flxvwr-linux-arm64-${{ github.ref_name }}.zip flxvwr-darwin-arm64
+
+      - name: Upload assets
+        uses: softprops/action-gh-release@vv2.0.9
+        with:
+          make_latest: true
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: |
+              flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
+              flxvwr-darwin-x64-${{ github.ref_name }}.tar.gz
+              flxvwr-darwin-arm64-${{ github.ref_name }}.tar.gz
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
