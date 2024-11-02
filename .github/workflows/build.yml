@@ -50,6 +50,10 @@ jobs:
           mkdir -p build/arm64
           GOARCH=arm64 fyne package -os darwin -icon icon.png -name build/arm64/flxvwr
 
+      - name: Ad-Hoc Code Signing for arm64
+        run: |
+          codesign --sign - --force --deep build/arm64/flxvwr.app
+
       - name: Install create-dmg
         run: brew install create-dmg
 
@@ -91,6 +95,10 @@ jobs:
         run: |
           mkdir -p build/x64
           GOARCH=amd64 fyne package -os darwin -icon icon.png -name build/x64/flxvwr
+
+      - name: Ad-Hoc Code Signing for x64
+        run: |
+          codesign --sign - --force --deep build/x64/flxvwr.app
 
       - name: Install create-dmg
         run: brew install create-dmg
