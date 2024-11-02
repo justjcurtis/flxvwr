@@ -66,7 +66,7 @@ jobs:
             "build/arm64/flxvwr.app" \
 
       - name: Upload arm64 DMG Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flxvwr-arm64.dmg
           path: build/arm64/flxvwr-arm64.dmg
@@ -109,7 +109,7 @@ jobs:
             "build/x64/flxvwr.app" \
 
       - name: Upload x64 DMG Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flxvwr-x64.dmg
           path: build/x64/flxvwr-x64.dmg
