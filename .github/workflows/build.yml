@@ -20,4 +20,4 @@ jobs:
           go-version: 1.22.1
 
       - name: Build for linux
-        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build . -o flxvwr-darwin-x64
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o flxvwr-darwin-x64 .
