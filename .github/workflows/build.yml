@@ -33,12 +33,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
-
+  
       - name: Set up Go
         uses: actions/setup-go@v5.1.0
         with:
           go-version: 1.22.1
-
+  
       - name: Install fyne
         run: go install fyne.io/fyne/v2/cmd/fyne@latest
   
@@ -49,9 +49,38 @@ jobs:
         run: |
           mkdir -p build/windows
           fyne package -os windows -icon icon.png -name flxvwr
+          mv flxvwr.exe build/windows/flxvwr.exe
   
-      - name: Upload Windows Artifact
+      - name: Install Inno Setup
+        run: |
+          curl -L -o is.exe https://jrsoftware.org/download.php/is.exe
+          ./is.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+          echo "::add-path::C:\\Program Files (x86)\\Inno Setup 6"
+  
+      - name: Generate Inno Setup Script
+        run: |
+          echo [Setup] > flxvwr.iss
+          echo AppName=flxvwr >> flxvwr.iss
+          echo AppVersion=1.0 >> flxvwr.iss
+          echo DefaultDirName={autopf}\\flxvwr >> flxvwr.iss
+          echo DefaultGroupName=flxvwr >> flxvwr.iss
+          echo OutputDir=build/windows >> flxvwr.iss
+          echo OutputBaseFilename=flxvwr_installer >> flxvwr.iss
+          echo SetupIconFile=icon.png >> flxvwr.iss
+          echo [Files] >> flxvwr.iss
+          echo Source: "build/windows/flxvwr.exe"; DestDir: "{app}"; Flags: ignoreversion >> flxvwr.iss
+          echo [Icons] >> flxvwr.iss
+          echo Name: "{group}\\flxvwr"; Filename: "{app}\\flxvwr.exe" >> flxvwr.iss
+          echo Name: "{commondesktop}\\flxvwr"; Filename: "{app}\\flxvwr.exe"; Tasks: desktopicon >> flxvwr.iss
+          echo [Tasks] >> flxvwr.iss
+          echo Name: "desktopicon"; Description: "Create a &Desktop shortcut"; GroupDescription: "Additional icons:" >> flxvwr.iss
+  
+      - name: Build Windows Installer
+        run: |
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" flxvwr.iss
+  
+      - name: Upload Windows Installer Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flxvwr.exe
-          path: flxvwr.exe
+          name: flxvwr_installer.exe
+          path: build/windows/flxvwr_installer.exe
