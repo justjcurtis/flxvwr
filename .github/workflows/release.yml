@@ -71,12 +71,6 @@ jobs:
             "build/arm64/flxvwr-arm64.dmg" \
             "build/arm64/flxvwr.app" \
 
-      - name: Upload arm64 DMG Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: flxvwr-arm64-{{ github.ref_name }}.dmg
-          path: build/arm64/flxvwr-arm64.dmg
-
   build-darwin-x64:
     runs-on: macos-13
     steps:
@@ -117,12 +111,6 @@ jobs:
             --app-drop-link 400 150 \
             "build/x64/flxvwr-x64.dmg" \
             "build/x64/flxvwr.app" \
-
-      - name: Upload x64 DMG Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: flxvwr-x64-{{ github.ref_name }}.dmg
-          path: build/x64/flxvwr-x64.dmg
   
   release:
     runs-on: ubuntu-latest
