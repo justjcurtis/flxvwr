@@ -27,4 +27,25 @@ jobs:
 
       - name: Run tests
         run: go test -v ./...
+  build-darwin-arm:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        
+      - name: Set up Go
+        uses: actions/setup-go@v5.1.0
+        with:
+          go-version: 1.22.1
 
+      - name: Install Fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+
+      - name: Download Icon
+        run: curl -o icon.png https://i.ibb.co/RNpWkb6/flxvwr.png
+
+      - name: Build for darwin (Apple Silicon)
+        run: GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr-darwin-arm64
+
+      - name: Run tests
+        run: go test -v ./...
