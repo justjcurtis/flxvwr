@@ -48,7 +48,8 @@ jobs:
       - name: Build for darwin (Apple Silicon)
         run: |
           mkdir -p build/arm64
-          GOARCH=arm64 fyne package -os darwin -icon icon.png -name build/arm64/flxvwr
+          GOARCH=arm64 fyne package -os darwin -icon icon.png -name flxvwr
+          mv flxvwr.app build/arm64/flxvwr.app
 
       - name: Ad-Hoc Code Signing for arm64
         run: |
@@ -94,7 +95,8 @@ jobs:
       - name: Build for darwin (Intel)
         run: |
           mkdir -p build/x64
-          GOARCH=amd64 fyne package -os darwin -icon icon.png -name build/x64/flxvwr
+          GOARCH=amd64 fyne package -os darwin -icon icon.png -name flxvwr
+          mv flxvwr.app build/x64/flxvwr.app
 
       - name: Ad-Hoc Code Signing for x64
         run: |
