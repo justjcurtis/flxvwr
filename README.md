@@ -65,7 +65,6 @@ Launch the application, drag&drop images or directories into the window, and sta
 
 ## Roadmap
 
-- **Release Scripts**: Add windows to release script & package macOS releases as a `.dmg` with a `.app` inside.
 - **Publish Releases**: Publish releases to AUR, Homebrew, and Chocolatey.
 - **Playlist Management**: Add support for creating, saving, and loading playlists.
 - **Zoom & Pan**: Fixes for keeping the image centered when zooming in/out are needed.
