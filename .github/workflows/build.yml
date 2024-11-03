@@ -46,14 +46,14 @@ jobs:
       - name: Install Fyne
         run: go install fyne.io/fyne/v2/cmd/fyne@latest
 
+      - name: Download Icon
+        run: curl -o flxvwr.png https://i.ibb.co/RNpWkb6/flxvwr.png
+
       - name: Build Go Application
         run: |
           mkdir -p build
           GOOS=linux GOARCH=amd64 fyne package -os linux -name flxvwr -icon flxvwr.png
           mv flxvwr build/flxvwr 
-
-      - name: Download Icon
-        run: curl -o flxvwr.png https://i.ibb.co/RNpWkb6/flxvwr.png
 
       - name: Create Desktop Entry
         run: |
