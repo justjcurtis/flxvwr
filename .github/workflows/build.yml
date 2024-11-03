@@ -63,7 +63,7 @@ jobs:
           GOOS=linux GOARCH=amd64 fyne package -os linux -name flxvwr -icon flxvwr.png
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@vv
+        uses: actions/upload-artifact@v4
         with:
           name: flxvwr
           path: flxvwr.tar.xz
