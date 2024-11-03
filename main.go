@@ -9,9 +9,9 @@ import (
 	"github.com/justjcurtis/flxvwr/utils"
 	"github.com/justjcurtis/flxvwr/views"
 
-	"fyne.io/fyne/v2
-	"fyne.io/fyne/v2/app/app/app"
-	"fyne.io/fyne/v2/themememe"
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/theme"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
