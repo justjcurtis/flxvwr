@@ -64,7 +64,7 @@ jobs:
       - name: Extract .tar.xz package
         run: |
           mkdir -p build/extracted
-          tar -xf build/flxvwr.tar.xz -C build/extracted
+          tar -xf flxvwr.tar.xz -C build/extracted
 
       - name: Modify .desktop file
         run: |
