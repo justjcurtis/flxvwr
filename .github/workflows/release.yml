@@ -42,7 +42,7 @@ jobs:
           VERSION="${VERSION#v}"
           DESKTOP_FILE="build/extracted/usr/local/share/applications/flxvwr.desktop"
           echo "" >> $DESKTOP_FILE
-          echo "Version=${{ VERSION }}" >> $DESKTOP_FILE
+          echo "Version=$VERSION" >> $DESKTOP_FILE
           echo "Comment=simple, flexible, image viewer" >> $DESKTOP_FILE
           echo "Categories=Utility;Application;" >> $DESKTOP_FILE
           echo "Terminal=false" >> $DESKTOP_FILE
@@ -180,7 +180,7 @@ jobs:
           $version = "${{ github.ref_name }}" -replace '^v', ''
           Write-Output "[Setup]" | Out-File -FilePath flxvwr.iss -Encoding UTF8
           Add-Content -Path flxvwr.iss -Value "AppName=flxvwr"
-          Add-Content -Path flxvwr.iss -Value "AppVersion=1.0"
+          Add-Content -Path flxvwr.iss -Value "AppVersion=$version"
           Add-Content -Path flxvwr.iss -Value "DefaultDirName={autopf}\flxvwr"
           Add-Content -Path flxvwr.iss -Value "DefaultGroupName=flxvwr"
           Add-Content -Path flxvwr.iss -Value "OutputDir=build/windows"
