@@ -263,5 +263,8 @@ jobs:
             ./build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
             ./build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
             ./build/windows/flxvwr_installer-${{ github.ref_name }}.exe
+        body: |
+          🚀 Automated Release! 🎉  
+          Thank you for your support! 🙏
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
