@@ -27,3 +27,68 @@ jobs:
 
       - name: Run tests
         run: go test -v ./...
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+  
+      - name: Set up Go
+        uses: actions/setup-go@v5.1.0
+        with:
+          go-version: 1.22.1
+  
+      - name: Install fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
+  
+      - name: Download Icon
+        run: curl -o icon.png https://i.ibb.co/RNpWkb6/flxvwr.png
+  
+      - name: Install ImageMagick
+        run: choco install imagemagick -y
+  
+      - name: Resize and Convert Icon to ICO
+        run: magick icon.png -resize 256x256 icon.ico
+  
+      - name: Build for Windows
+        run: |
+          mkdir -p build/windows
+          fyne package -os windows -icon icon.ico -name flxvwr
+          mv flxvwr.exe build/windows/flxvwr.exe
+  
+      - name: Install Inno Setup
+        run: |
+          curl -L -o is.exe https://jrsoftware.org/download.php/is.exe
+          ./is.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+  
+      - name: Add Inno Setup to PATH
+        shell: bash
+        run: echo "C:\\Program Files (x86)\\Inno Setup 6" >> $GITHUB_PATH
+  
+      - name: Generate Inno Setup Script
+        run: |
+          Write-Output "[Setup]" | Out-File -FilePath flxvwr.iss -Encoding UTF8
+          Add-Content -Path flxvwr.iss -Value "AppName=flxvwr"
+          Add-Content -Path flxvwr.iss -Value "AppVersion=1.0"
+          Add-Content -Path flxvwr.iss -Value "DefaultDirName={autopf}\flxvwr"
+          Add-Content -Path flxvwr.iss -Value "DefaultGroupName=flxvwr"
+          Add-Content -Path flxvwr.iss -Value "OutputDir=build/windows"
+          Add-Content -Path flxvwr.iss -Value "OutputBaseFilename=flxvwr_installer"
+          Add-Content -Path flxvwr.iss -Value "SetupIconFile=icon.ico"
+          Add-Content -Path flxvwr.iss -Value "[Files]"
+          Add-Content -Path flxvwr.iss -Value 'Source: "build/windows/flxvwr.exe"; DestDir: "{app}"; Flags: ignoreversion'
+          Add-Content -Path flxvwr.iss -Value "[Icons]"
+          Add-Content -Path flxvwr.iss -Value 'Name: "{group}\flxvwr"; Filename: "{app}\flxvwr.exe"'
+          Add-Content -Path flxvwr.iss -Value 'Name: "{commondesktop}\flxvwr"; Filename: "{app}\flxvwr.exe"; Tasks: desktopicon'
+          Add-Content -Path flxvwr.iss -Value "[Tasks]"
+          Add-Content -Path flxvwr.iss -Value 'Name: "desktopicon"; Description: "Create a &Desktop shortcut"; GroupDescription: "Additional icons:"'
+  
+      - name: Build Windows Installer
+        run: ISCC.exe flxvwr.iss
+  
+      - name: Upload Windows Installer Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: flxvwr_installer.exe
+          path: build/windows/flxvwr_installer.exe

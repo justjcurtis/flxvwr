@@ -1,15 +1,17 @@
 package main
 
 import (
+	"log"
+	"time"
+
 	"github.com/justjcurtis/flxvwr/services"
 	"github.com/justjcurtis/flxvwr/shortcuts"
 	"github.com/justjcurtis/flxvwr/utils"
 	"github.com/justjcurtis/flxvwr/views"
-	"log"
-	"time"
 
-	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2
+	"fyne.io/fyne/v2/app/app/app"
+	"fyne.io/fyne/v2/themememe"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
@@ -39,6 +41,7 @@ func main() {
 	}
 
 	a := app.New()
+	a.Settings().SetTheme(theme.DarkTheme())
 	w := a.NewWindow("flxvwr")
 
 	w.Resize(fyne.NewSize(800, 600))
