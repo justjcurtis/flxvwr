@@ -54,6 +54,12 @@ jobs:
           tar -cJf ../flxvwr-x64-${{ github.ref_name }}.tar.xz .
           cd ..
 
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flxvwr-x64-${{ github.ref_name }}
+          path: build/flxvwr-x64-${{ github.ref_name }}.tar.xz
+
   build-darwin-arm:
     runs-on: macos-latest
     steps:
@@ -95,6 +101,12 @@ jobs:
             "build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg" \
             "build/arm64/flxvwr.app" \
 
+      - name: Upload Darwin ARM Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flxvwr-darwin-arm64-${{ github.ref_name }}
+          path: build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
+
   build-darwin-x64:
     runs-on: macos-13
     steps:
@@ -135,6 +147,12 @@ jobs:
             --app-drop-link 400 150 \
             "build/x64/flxvwr-x64-${{ github.ref_name }}.dmg" \
             "build/x64/flxvwr.app" \
+
+      - name: Upload Darwin x64 Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flxvwr-darwin-x64-${{ github.ref_name }}
+          path: build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
 
   build-windows:
     runs-on: windows-latest
@@ -199,6 +217,12 @@ jobs:
 
       - name: Rename Installer
         run: mv build/windows/flxvwr_installer.exe build/windows/flxvwr_installer-${{ github.ref_name }}.exe
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flxvwr_installer-${{ github.ref_name }}
+          path: build/windows/flxvwr_installer-${{ github.ref_name }}.exe
   
   release:
     runs-on: ubuntu-latest
