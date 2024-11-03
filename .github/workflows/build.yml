@@ -52,6 +52,9 @@ jobs:
           GOOS=linux GOARCH=amd64 fyne package -os linux -name flxvwr -icon flxvwr.png
           mv flxvwr build/flxvwr 
 
+      - name: Download Icon
+        run: curl -o flxvwr.png https://i.ibb.co/RNpWkb6/flxvwr.png
+
       - name: Create Desktop Entry
         run: |
           echo "[Desktop Entry]" > build/flxvwr.desktop
