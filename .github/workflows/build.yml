@@ -69,6 +69,7 @@ jobs:
       - name: Modify .desktop file
         run: |
           DESKTOP_FILE="build/extracted/usr/local/share/applications/flxvwr.desktop"
+          echo "" >> $DESKTOP_FILE
           echo "Version=1.0" >> $DESKTOP_FILE
           echo "Comment=simple, flexible, image viewer" >> $DESKTOP_FILE
           echo "Categories=Utility;Application;" >> $DESKTOP_FILE
