@@ -228,16 +228,40 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-linux, build-darwin-arm, build-darwin-x64, build-windows]
     steps:
-      - name: Upload assets
+      - name: Download Linux Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: flxvwr-x64-${{ github.ref_name }}
+          path: ./build/linux
+
+      - name: Download Darwin ARM Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: flxvwr-darwin-arm64-${{ github.ref_name }}
+          path: ./build/arm64
+
+      - name: Download Darwin x64 Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: flxvwr-darwin-x64-${{ github.ref_name }}
+          path: ./build/x64
+
+      - name: Download Windows Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: flxvwr_installer-${{ github.ref_name }}
+          path: ./build/windows
+
+      - name: Create Release
         uses: softprops/action-gh-release@v2.0.9
         with:
           make_latest: true
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           files: |
-            build/flxvwr-x64-${{ github.ref_name }}.tar.xz
-            build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
-            build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
-            build/windows/flxvwr_installer-${{ github.ref_name }}.exe
+            ./build/linux/flxvwr-x64-${{ github.ref_name }}.tar.xz
+            ./build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
+            ./build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
+            ./build/windows/flxvwr_installer-${{ github.ref_name }}.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
