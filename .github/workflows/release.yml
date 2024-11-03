@@ -9,26 +9,48 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4.2.2
-        
+
       - name: Set up Go
         uses: actions/setup-go@v5.1.0
         with:
           go-version: 1.22.1
 
-      - name: Install deps
-        shell: bash
-        run: sudo apt-get update && sudo apt-get install gcc libgl1-mesa-dev xorg-dev
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcc libgl1-mesa-dev xorg-dev xz-utils
 
-      - name: Build for linux
-        run: go build -o flxvwr-darwin-x64 .
+      - name: Install Fyne
+        run: go install fyne.io/fyne/v2/cmd/fyne@latest
 
-      - name: Run tests
-        run: go test ./...
+      - name: Download Icon
+        run: curl -o flxvwr.png https://i.ibb.co/RNpWkb6/flxvwr.png
 
-      - name: Archive
-        run: tar -czvf flxvwr-linux-x64-${{ github.ref_name }}.tar.gz flxvwr-linux-x64
+      - name: Build Go Application
+        run: |
+          mkdir -p build
+          GOOS=linux GOARCH=amd64 fyne package -os linux -name flxvwr -icon flxvwr.png
+
+      - name: Extract .tar.xz package
+        run: |
+          mkdir -p build/extracted
+          tar -xf flxvwr.tar.xz -C build/extracted
+
+      - name: Modify .desktop file
+        run: |
+          DESKTOP_FILE="build/extracted/usr/local/share/applications/flxvwr.desktop"
+          echo "" >> $DESKTOP_FILE
+          echo "Version=1.0" >> $DESKTOP_FILE
+          echo "Comment=simple, flexible, image viewer" >> $DESKTOP_FILE
+          echo "Categories=Utility;Application;" >> $DESKTOP_FILE
+          echo "Terminal=false" >> $DESKTOP_FILE
+          echo "StartupWMClass=flxvwr" >> $DESKTOP_FILE
+
+      - name: Repackage into a .tar.xz archive
+        run: |
+          cd build/extracted
+          tar -cJf ../flxvwr-x64-${{ github.ref_name }}.tar.xz .
+          cd ..
 
   build-darwin-arm:
     runs-on: macos-latest
@@ -68,7 +90,7 @@ jobs:
             --window-size 600 400 \
             --icon-size 100 \
             --app-drop-link 400 150 \
-            "build/arm64/flxvwr-arm64.dmg" \
+            "build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg" \
             "build/arm64/flxvwr.app" \
 
   build-darwin-x64:
@@ -109,7 +131,7 @@ jobs:
             --window-size 600 400 \
             --icon-size 100 \
             --app-drop-link 400 150 \
-            "build/x64/flxvwr-x64.dmg" \
+            "build/x64/flxvwr-x64-${{ github.ref_name }}.dmg" \
             "build/x64/flxvwr.app" \
 
   build-windows:
@@ -170,12 +192,9 @@ jobs:
   
       - name: Build Windows Installer
         run: ISCC.exe flxvwr.iss
-  
-      - name: Upload Windows Installer Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: flxvwr_installer.exe
-          path: build/windows/flxvwr_installer.exe
+
+      - name: Rename Installer
+        run: mv build/windows/flxvwr_installer.exe build/windows/flxvwr_installer-${{ github.ref_name }}.exe
   
   release:
     runs-on: ubuntu-latest
@@ -188,7 +207,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           files: |
-              flxvwr-linux-x64-${{ github.ref_name }}.tar.gz
+              build/flxvwr-x64-${{ github.ref_name }}.tar.gz
               build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
               build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
               build/windows/flxvwr_installer.exe
