@@ -38,9 +38,11 @@ jobs:
 
       - name: Modify .desktop file
         run: |
+          VERSION="${GITHUB_REF##*/}"
+          VERSION="${VERSION#v}"
           DESKTOP_FILE="build/extracted/usr/local/share/applications/flxvwr.desktop"
           echo "" >> $DESKTOP_FILE
-          echo "Version=1.0" >> $DESKTOP_FILE
+          echo "Version=${{ VERSION }}" >> $DESKTOP_FILE
           echo "Comment=simple, flexible, image viewer" >> $DESKTOP_FILE
           echo "Categories=Utility;Application;" >> $DESKTOP_FILE
           echo "Terminal=false" >> $DESKTOP_FILE
@@ -173,7 +175,9 @@ jobs:
         run: echo "C:\\Program Files (x86)\\Inno Setup 6" >> $GITHUB_PATH
   
       - name: Generate Inno Setup Script
+        shell: pwsh
         run: |
+          $version = "${{ github.ref_name }}" -replace '^v', ''
           Write-Output "[Setup]" | Out-File -FilePath flxvwr.iss -Encoding UTF8
           Add-Content -Path flxvwr.iss -Value "AppName=flxvwr"
           Add-Content -Path flxvwr.iss -Value "AppVersion=1.0"
@@ -210,6 +214,6 @@ jobs:
               build/flxvwr-x64-${{ github.ref_name }}.tar.gz
               build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
               build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
-              build/windows/flxvwr_installer.exe
+              build/windows/flxvwr_installer-${{ github.ref_name }}.exe
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
