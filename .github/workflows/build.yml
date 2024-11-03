@@ -47,9 +47,8 @@ jobs:
         with:
           go-version: 1.22.1
 
-      - name: Install deps
-        shell: bash
-        run: sudo apt-get update && sudo apt-get install gcc libgl1-mesa-dev xorg-dev
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcc libgl1-mesa-dev xorg-dev xz-utils
 
       - name: Install Fyne
         run: go install fyne.io/fyne/v2/cmd/fyne@latest
@@ -62,8 +61,28 @@ jobs:
           mkdir -p build
           GOOS=linux GOARCH=amd64 fyne package -os linux -name flxvwr -icon flxvwr.png
 
-      - name: Upload Artifact
+      - name: Extract .tar.xz package
+        run: |
+          mkdir -p build/extracted
+          tar -xf build/flxvwr.tar.xz -C build/extracted
+
+      - name: Modify .desktop file
+        run: |
+          DESKTOP_FILE="build/extracted/usr/local/share/applications/flxvwr.desktop"
+          echo "Version=1.0" >> $DESKTOP_FILE
+          echo "Comment=simple, flexible, image viewer" >> $DESKTOP_FILE
+          echo "Categories=Utility;Application;" >> $DESKTOP_FILE
+          echo "Terminal=false" >> $DESKTOP_FILE
+          echo "StartupWMClass=flxvwr" >> $DESKTOP_FILE
+
+      - name: Repackage into a .tar.xz archive
+        run: |
+          cd build/extracted
+          tar -cJf ../flxvwr.tar.xz .
+          cd ..
+
+      - name: Upload modified package artifact
         uses: actions/upload-artifact@v4
         with:
-          name: flxvwr
-          path: flxvwr.tar.xz
+          name: flxvwr.tar.xz
+          path: build/flxvwr.tar.xz
