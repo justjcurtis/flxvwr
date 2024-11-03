@@ -55,7 +55,7 @@ jobs:
           cd ..
 
       - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flxvwr-x64-${{ github.ref_name }}
           path: build/flxvwr-x64-${{ github.ref_name }}.tar.xz
@@ -102,7 +102,7 @@ jobs:
             "build/arm64/flxvwr.app" \
 
       - name: Upload Darwin ARM Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flxvwr-darwin-arm64-${{ github.ref_name }}
           path: build/arm64/flxvwr-arm64-${{ github.ref_name }}.dmg
@@ -149,7 +149,7 @@ jobs:
             "build/x64/flxvwr.app" \
 
       - name: Upload Darwin x64 Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flxvwr-darwin-x64-${{ github.ref_name }}
           path: build/x64/flxvwr-x64-${{ github.ref_name }}.dmg
@@ -219,7 +219,7 @@ jobs:
         run: mv build/windows/flxvwr_installer.exe build/windows/flxvwr_installer-${{ github.ref_name }}.exe
 
       - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: flxvwr_installer-${{ github.ref_name }}
           path: build/windows/flxvwr_installer-${{ github.ref_name }}.exe
@@ -229,25 +229,25 @@ jobs:
     needs: [build-linux, build-darwin-arm, build-darwin-x64, build-windows]
     steps:
       - name: Download Linux Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: flxvwr-x64-${{ github.ref_name }}
           path: ./build/linux
 
       - name: Download Darwin ARM Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: flxvwr-darwin-arm64-${{ github.ref_name }}
           path: ./build/arm64
 
       - name: Download Darwin x64 Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: flxvwr-darwin-x64-${{ github.ref_name }}
           path: ./build/x64
 
       - name: Download Windows Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: flxvwr_installer-${{ github.ref_name }}
           path: ./build/windows
