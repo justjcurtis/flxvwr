@@ -3,8 +3,16 @@ name: Build
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'Licence.md'
+      - '.gitignore'
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'Licence.md'
+      - '.gitignore'
 
 jobs:
   build-linux:
@@ -53,52 +61,9 @@ jobs:
         run: |
           mkdir -p build
           GOOS=linux GOARCH=amd64 fyne package -os linux -name flxvwr -icon flxvwr.png
-          ls -a
-          mv flxvwr build/flxvwr 
 
-      - name: Create Desktop Entry
-        run: |
-          echo "[Desktop Entry]" > build/flxvwr.desktop
-          echo "Version=1.0" >> build/flxvwr.desktop
-          echo "Type=Application" >> build/flxvwr.desktop
-          echo "Name=FLXVR" >> build/flxvwr.desktop
-          echo "Comment=simple, flexible, image viewer" >> build/flxvwr.desktop
-          echo "Exec=flxvwr" >> build/flxvwr.desktop
-          echo "Icon=flxvwr" >> build/flxvwr.desktop
-          echo "Terminal=false" >> build/flxvwr.desktop
-          echo "Categories=Utility;Application;" >> build/flxvwr.desktop
-
-      - name: Copy Icon File
-        run: |
-          cp flxvwr.png build/flxvwr.png
-
-      - name: Create PKGBUILD File
-        run: |
-          echo "# Maintainer: Jacson Curtis <justjcurtis@gmail.com>" > build/PKGBUILD
-          echo "pkgname=flxvwr" >> build/PKGBUILD
-          echo "pkgver=1.0.0" >> build/PKGBUILD
-          echo "pkgrel=1" >> build/PKGBUILD
-          echo "pkgdesc=\"simple, flexible, image viewer\"" >> build/PKGBUILD
-          echo "arch=('x86_64')" >> build/PKGBUILD
-          echo "url=\"https://github.com/justjcurtis/flxvwr\"" >> build/PKGBUILD
-          echo "license=('MIT')" >> build/PKGBUILD
-          echo "depends=('')" >> build/PKGBUILD 
-          echo "source=(\"build/flxvwr\" \"build/flxvwr.png\" \"build/flxvwr.desktop\")" >> build/PKGBUILD
-          echo "sha256sums=('SKIP' 'SKIP' 'SKIP')" >> build/PKGBUILD
-          echo "" >> build/PKGBUILD
-          echo "package() {" >> build/PKGBUILD
-          echo "  install -Dm755 \"\$srcdir/build/flxvwr\" \"\$pkgdir/usr/bin/flxvwr\"" >> build/PKGBUILD
-          echo "  install -Dm644 \"\$srcdir/build/flxvwr.png\" \"\$pkgdir/usr/share/icons/hicolor/256x256/apps/flxvwr.png\"" >> build/PKGBUILD
-          echo "  install -Dm644 \"\$srcdir/build/flxvwr.desktop\" \"\$pkgdir/usr/share/applications/flxvwr.desktop\"" >> build/PKGBUILD
-          echo "}" >> build/PKGBUILD
-
-      - name: Build Package
-        run: |
-          cd build
-          makepkg -f
-
-      - name: Upload Package Artifact
-        uses: actions/upload-artifact@v3
+      - name: Upload Artifact
+        uses: actions/upload-artifact@vv
         with:
-          name: flxvwr-package
-          path: build/*.pkg.tar.zst
+          name: flxvwr
+          path: flxvwr.tar.xz
