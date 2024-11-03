@@ -53,6 +53,7 @@ jobs:
         run: |
           mkdir -p build
           GOOS=linux GOARCH=amd64 fyne package -os linux -name flxvwr -icon flxvwr.png
+          ls -a
           mv flxvwr build/flxvwr 
 
       - name: Create Desktop Entry
