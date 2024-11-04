@@ -52,6 +52,11 @@ jobs:
           VERSION="${VERSION#v}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
+      - name: Install Dependencies
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm base-devel git openssh
+
       - name: Set up SSH Key
         run: |
           mkdir -p ~/.ssh
