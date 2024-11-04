@@ -61,7 +61,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.aurssh }}" > ~/.ssh/aur
           chmod 600 ~/.ssh/aur
-          ssh-keyscan -t rsa aur.archlinux.org >> ~/.ssh/known_hosts || true
+          ssh-keyscan -t rsa,ecdsa aur.archlinux.org >> ~/.ssh/known_hosts || true 
           touch ~/.ssh/config
           echo "Host aur.archlinux.org" >> ~/.ssh/config
           echo "  User aur" >> ~/.ssh/config
