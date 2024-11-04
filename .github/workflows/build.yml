@@ -59,7 +59,9 @@ jobs:
       - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.aurssh }}" > ~/.ssh/aur
+          echo "${{ secrets.AURSSH }}" > ~/.ssh/aur
+          # print length of secret
+          echo "${{ secrets.AURSSH }}" | wc -c
           chmod 600 ~/.ssh/aur
           ssh-keyscan -t rsa,ecdsa aur.archlinux.org >> ~/.ssh/known_hosts || true 
           touch ~/.ssh/config
