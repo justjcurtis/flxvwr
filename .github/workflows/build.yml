@@ -52,7 +52,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pacman -S --noconfirm base-devel git
+          pacman -S --noconfirm base-devel git openssh
 
       - name: Get Release Version
         id: get_version
