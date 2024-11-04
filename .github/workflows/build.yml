@@ -40,45 +40,43 @@ jobs:
       - name: Run tests
         run: go test -v ./...
 
-  test-aur:
+name: Release Workflow
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux/archlinux:latest
     steps:
       - name: Get Release Version
         id: get_version
         run: |
-          VERSION="v0.0.3"
+          VERSION="${{ github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
-      - name: Install SSH and Git
-        run: |
-          pacman -Sy --noconfirm openssh git
-
-      - name: Set up SSH
+      - name: Set up SSH Key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AURSSH }}" > ~/.ssh/aur
-          echo "${{ secrets.AURPUBSSH }}" > ~/.ssh/aur.pub
-          eval $(ssh-agent)
-          ssh-add - <<< "${{ secrets.AURSSH }}"
-          chmod 600 ~/.ssh/aur
-          chmod 600 ~/.ssh/aur.pub
-          ssh-keyscan -t rsa,ed25519,ecdsa aur.archlinux.org >> ~/.ssh/known_hosts || true 
-          touch ~/.ssh/config
+          echo "${{ secrets.AURSSH }}" > ~/.ssh/private.key
+          chmod 600 ~/.ssh/private.key
+
+      - name: Add SSH Known Hosts
+        run: |
+          ssh-keyscan -t rsa,ecdsa,ed25519 aur.archlinux.org >> ~/.ssh/known_hosts
+
+      - name: Configure SSH Client
+        run: |
           echo "Host aur.archlinux.org" >> ~/.ssh/config
           echo "  User aur" >> ~/.ssh/config
-          echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/private.key" >> ~/.ssh/config
+          echo "  StrictHostKeyChecking yes" >> ~/.ssh/config
+          echo "  UserKnownHostsFile ~/.ssh/known_hosts" >> ~/.ssh/config
 
-      - name: Cat SSH config
-        run: |
-          cat ~/.ssh/config
-          cat ~/.ssh/known_hosts
-
-      - name: Checkout aur repo
-        run: |
-          git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
+      - name: Clone AUR Repository
+        run: git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
 
       - name: Cat PKGBUILD (before)
         run: cat flxvwr-bin/PKGBUILD
@@ -94,12 +92,10 @@ jobs:
       - name: Update .SRCINFO
         run: |
           cd flxvwr-bin
-          rm -f .SRCINFO
           makepkg --printsrcinfo > .SRCINFO
 
       - name: Cat PKGBUILD (after)
         run: cat flxvwr-bin/PKGBUILD
-
+        
       - name: Cat .SRCINFO (after)
         run: cat flxvwr-bin/.SRCINFO
-
