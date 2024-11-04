@@ -267,4 +267,4 @@ jobs:
             🚀 Automated Release! 🎉  
             Thank you for your support! 🙏
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GHTOKEN }}
