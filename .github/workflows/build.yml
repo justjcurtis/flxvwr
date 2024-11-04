@@ -77,8 +77,6 @@ jobs:
 
       - name: Clone AUR Repository
         run: |
-          cat ~/.ssh/config
-          cat ~/.ssh/known_hosts
           git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
 
       - name: Update PKGBUILD
