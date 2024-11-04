@@ -26,32 +26,15 @@ func TestGetConfigPath_Windows(t *testing.T) {
 	}
 }
 
-func TestGetConfigPath_Linux_XDGConfigHome(t *testing.T) {
+func TestGetConfigPath_Linux(t *testing.T) {
 	getOS = func() string { return "linux" }
+	getLinuxConfigDir = func() (string, error) { return "/home/testuser/.config", nil }
+	defer func() { getLinuxConfigDir = func() (string, error) { return os.UserConfigDir() } }()
 	defer func() { getOS = func() string { return runtime.GOOS } }()
 
-	testXDGConfigPath := "/home/testuser/.config"
-	os.Setenv("XDG_CONFIG_HOME", testXDGConfigPath)
-	defer os.Unsetenv("XDG_CONFIG_HOME")
+	testConfigPath := "/home/testuser/.config"
 
-	expectedPath := filepath.Join(testXDGConfigPath, "flxvwr")
-	result, err := GetConfigPath()
-
-	if err != nil {
-		t.Fatalf("Unexpected error: %v", err)
-	}
-	if result != expectedPath {
-		t.Errorf("Expected %v, got %v", expectedPath, result)
-	}
-}
-
-func TestGetConfigPath_Linux_Default(t *testing.T) {
-	getOS = func() string { return "linux" }
-	defer func() { getOS = func() string { return runtime.GOOS } }()
-
-	os.Unsetenv("XDG_CONFIG_HOME")
-
-	expectedPath := "/etc/flxvwr"
+	expectedPath := filepath.Join(testConfigPath, "flxvwr")
 	result, err := GetConfigPath()
 
 	if err != nil {
