@@ -61,6 +61,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AURSSH }}" > ~/.ssh/aur
           echo "${{ secrets.AURPUBSSH }}" > ~/.ssh/aur.pub
+          eval $(ssh-agent)
+          ssh-add - <<< "${{ secrets.AURSSH }}"
           chmod 600 ~/.ssh/aur
           chmod 600 ~/.ssh/aur.pub
           ssh-keyscan -t rsa,ed25519,ecdsa aur.archlinux.org >> ~/.ssh/known_hosts || true 
