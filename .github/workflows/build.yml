@@ -86,8 +86,7 @@ jobs:
           makepkg --printsrcinfo > .SRCINFO
           git add PKGBUILD .SRCINFO
           if ! git diff --cached --quiet; then
-            git commit -m "Update to v$VERSION"
-            git push
+            echo "Changes detected"
           else
             echo "No changes to commit"
           fi
