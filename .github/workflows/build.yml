@@ -67,8 +67,11 @@ jobs:
           echo "${{ secrets.AURSSH }}" > ~/.ssh/aur
           chmod 600 ~/.ssh/aur
           ssh-keyscan -t rsa,ecdsa,ed25519 aur.archlinux.org >> ~/.ssh/known_hosts
-          echo "Host aur.archlinux.org\n  User aur\n  IdentityFile ~/.ssh/aur" > ~/.ssh/config
+          echo "Host aur.archlinux.org" >> ~/.ssh/config
+          echo "  User aur" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
           chmod 644 ~/.ssh/config
+
 
       - name: Clone AUR Repository
         run: |
