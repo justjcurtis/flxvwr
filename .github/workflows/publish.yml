@@ -68,6 +68,7 @@ jobs:
 
       - name: Commit and push
         run: |
+          git config --global --add safe.directory flxvwr-bin
           cd flxvwr-bin
           git config --global user.email "justjcurtis@gmail.com"
           git config --global user.name "justjcurtis"
