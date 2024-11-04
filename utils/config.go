@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -10,6 +11,10 @@ var getOS = func() string {
 	return runtime.GOOS
 }
 
+var getLinuxConfigDir = func() (string, error) {
+	return os.UserConfigDir()
+}
+
 func GetConfigPath() (string, error) {
 	var configPath string
 	o := getOS()
@@ -17,11 +22,11 @@ func GetConfigPath() (string, error) {
 	case "windows":
 		configPath = filepath.Join(os.Getenv("APPDATA"), "flxvwr")
 	case "linux":
-		if xdgConfig := os.Getenv("XDG_CONFIG_HOME"); xdgConfig != "" {
-			configPath = filepath.Join(xdgConfig, "flxvwr")
-		} else {
-			configPath = "/etc/flxvwr"
+		configDir, err := getLinuxConfigDir()
+		if err != nil {
+			return "", fmt.Errorf("failed to get user config dir: %w", err)
 		}
+		configPath = filepath.Join(configDir, "flxvwr")
 	case "darwin":
 		configPath = filepath.Join(os.Getenv("HOME"), "Library", "Application Support", "flxvwr")
 	default:
