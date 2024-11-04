@@ -42,8 +42,6 @@ jobs:
 
   test-aur:
     runs-on: ubuntu-latest
-    container:
-      image: archlinux/archlinux:latest
     steps:
       - name: Get Release Version
         id: get_version
@@ -52,31 +50,26 @@ jobs:
           VERSION="${VERSION#v}"
           echo "VERSION=${VERSION}" >> $GITHUB_ENV
 
-      - name: Install Dependencies
+      - name: Install Arch Linux Base
         run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm base-devel git openssh
+          sudo apt update
+          sudo apt install -y debootstrap
+          sudo debootstrap --arch=amd64 arch /mnt/arch http://mirrors.kernel.org/archlinux/$repo/os/$arch
 
-      - name: Set up SSH Key
+      - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.AURSSH }}" > ~/.ssh/private.key
-          chmod 600 ~/.ssh/private.key
-
-      - name: Add SSH Known Hosts
-        run: |
-          ssh-keyscan -t rsa,ecdsa,ed25519 aur.archlinux.org >> ~/.ssh/known_hosts
-
-      - name: Configure SSH Client
-        run: |
+          echo "${{ secrets.AURSSH }}" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          ssh-keyscan -t rsa aur.archlinux.org >> ~/.ssh/known_hosts
+          touch ~/.ssh/config
           echo "Host aur.archlinux.org" >> ~/.ssh/config
           echo "  User aur" >> ~/.ssh/config
-          echo "  IdentityFile ~/.ssh/private.key" >> ~/.ssh/config
-          echo "  StrictHostKeyChecking yes" >> ~/.ssh/config
-          echo "  UserKnownHostsFile ~/.ssh/known_hosts" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
 
-      - name: Clone AUR Repository
-        run: git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
+      - name: Checkout aur repo
+        run: |
+          git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
 
       - name: Cat PKGBUILD (before)
         run: cat flxvwr-bin/PKGBUILD
@@ -84,15 +77,21 @@ jobs:
       - name: Cat .SRCINFO (before)
         run: cat flxvwr-bin/.SRCINFO
 
-      - name: Update PKGBUILD
+      - name: Update Package in Arch Chroot
         run: |
-          cd flxvwr-bin
+          sudo chroot /mnt/arch /bin/bash <<EOF
+          pacman -Sy --noconfirm base-devel git
+          cd /workspace/flxvwr-bin
           sed -i "s/pkgver=.*/pkgver=$VERSION/" PKGBUILD
-
-      - name: Update .SRCINFO
-        run: |
-          cd flxvwr-bin
           makepkg --printsrcinfo > .SRCINFO
+          git add PKGBUILD .SRCINFO
+          if ! git diff --cached --quiet; then
+            git commit -m "Update to v$VERSION"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+          EOF
 
       - name: Cat PKGBUILD (after)
         run: cat flxvwr-bin/PKGBUILD
