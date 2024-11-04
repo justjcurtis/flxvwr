@@ -1,0 +1,54 @@
+name: Release Workflow
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish-aur:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get Release Version
+        id: get_version
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.aurssh }}" > ~/.ssh/aur
+          chmod 600 ~/.ssh/aur
+          ssh-keyscan -t rsa aur.archlinux.org >> ~/.ssh/known_hosts
+          touch ~/.ssh/config
+          echo "Host aur.archlinux.org" >> ~/.ssh/config
+          echo "  User aur" >> ~/.ssh/config
+          echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
+
+      - name: Checkout aur repo
+        run: |
+          git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
+
+      - name: Update PKGBUILD
+        run: |
+          cd flxvwr-bin
+          sed -i "s/pkgver=.*/pkgver=$VERSION/" PKGBUILD
+
+      - name: Update .SRCINFO
+        run: |
+          cd flxvwr-bin
+          rm -f .SRCINFO
+          makepkg --printsrcinfo > .SRCINFO
+
+      - name: Commit and push
+        run: |
+          cd flxvwr-bin
+          git add PKGBUILD .SRCINFO
+          if ! git diff --cached --quiet; then
+            git commit -m "Update to v$VERSION"
+            git push
+          else
+            echo "No changes to commit"
+          fi
