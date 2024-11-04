@@ -67,6 +67,11 @@ jobs:
           echo "  User aur" >> ~/.ssh/config
           echo "  IdentityFile ~/.ssh/aur" >> ~/.ssh/config
 
+      - name: Cat SSH config
+        run: |
+          cat ~/.ssh/config
+          cat ~/.ssh/known_hosts
+
       - name: Checkout aur repo
         run: |
           git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
