@@ -91,10 +91,16 @@ jobs:
       - name: Cat .SRCINFO (before)
         run: cat flxvwr-bin/.SRCINFO
 
+      - name: Get sha256sum
+        run: |
+          curl -sL https://github.com/justjcurtis/flxvwr/releases/download/v$VERSION/flxvwr-x64-v$VERSION.tar.xz | sha256sum | cut -d ' ' -f 1 > flxvwr-bin/flxvwr.sha256sum
+          curl -sL https://raw.githubusercontent.com/justjcurtis/flxvwr/main/LICENSE | sha256sum | cut -d ' ' -f 1 > flxvwr-bin/LICENSE.sha256sum
+
       - name: Update PKGBUILD
         run: |
           cd flxvwr-bin
           sed -i "s/pkgver=.*/pkgver=$VERSION/" PKGBUILD
+          sed -i "s/sha256sums=.*/sha256sums=('$(cat flxvwr.sha256sum)' '$(cat LICENSE.sha256sum)')/" PKGBUILD
 
       - name: Update .SRCINFO
         run: |
