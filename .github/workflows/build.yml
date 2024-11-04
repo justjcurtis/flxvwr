@@ -79,6 +79,18 @@ jobs:
         run: |
           git clone ssh://aur@aur.archlinux.org/flxvwr-bin.git
 
+      - name: Create non-root user
+        run: |
+          useradd -m builduser
+          echo "builduser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chown -R builduser:builduser flxvwr-bin
+
+      - name: Cat PKGBUILD (before)
+        run: cat flxvwr-bin/PKGBUILD
+
+      - name: Cat .SRCINFO (before)
+        run: cat flxvwr-bin/.SRCINFO
+
       - name: Update PKGBUILD
         run: |
           cd flxvwr-bin
@@ -87,7 +99,7 @@ jobs:
       - name: Update .SRCINFO
         run: |
           cd flxvwr-bin
-          makepkg --printsrcinfo > .SRCINFO
+          sudo -u builduser makepkg --printsrcinfo > .SRCINFO
 
       - name: Cat PKGBUILD (after)
         run: cat flxvwr-bin/PKGBUILD
