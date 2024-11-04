@@ -39,6 +39,16 @@ jobs:
       - name: Build for linux
         run: go build -o flxvwr-darwin-x64 .
 
+  test:
+    runs-on: ubuntu-latest
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+        
+      - name: Set up Go
+        uses: actions/setup-go@v5.1.0
+        with:
+          go-version: 1.22.1
+
       - name: Run tests
         run: go test -v ./...
 
