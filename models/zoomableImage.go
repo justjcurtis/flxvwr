@@ -18,14 +18,14 @@ func NewZoomableImage(image *canvas.Image) *ZoomableImage {
 		Image:     image,
 		prevScale: 1.0,
 		Scale:     1.0,
-		OffsetX:   0,
-		OffsetY:   0,
+		OffsetX:   0.0,
+		OffsetY:   0.0,
 	}
 }
 
 func (z *ZoomableImage) Reset() {
 	z.Scale = 1.0
-	z.OffsetX, z.OffsetY = 0, 0
+	z.OffsetX, z.OffsetY = 0.0, 0.0
 	z.Refresh()
 }
 
@@ -51,8 +51,8 @@ func (z *ZoomableImage) Zoom(dz float32) {
 	postScale := z.Scale
 	deltaScale := postScale - prevScale
 
-	imageCenterX := (float32(z.Image.Size().Width) / 2) - z.OffsetX
-	imageCenterY := (float32(z.Image.Size().Height) / 2) - z.OffsetY
+	imageCenterX := (float32(z.Image.Size().Width) / 2) + z.OffsetX
+	imageCenterY := (float32(z.Image.Size().Height) / 2) + z.OffsetY
 
 	z.OffsetX -= deltaScale * imageCenterX
 	z.OffsetY -= deltaScale * imageCenterY

@@ -1,13 +1,14 @@
 package services
 
 import (
-	"github.com/justjcurtis/flxvwr/models"
-	"github.com/justjcurtis/flxvwr/utils"
 	"image"
 	"image/color"
 	"math"
 	"os"
 	"time"
+
+	"github.com/justjcurtis/flxvwr/models"
+	"github.com/justjcurtis/flxvwr/utils"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
@@ -21,8 +22,14 @@ var AcceptedExtensions map[string]bool = map[string]bool{
 	".jpeg": true,
 }
 
+var PlaylistExtensions map[string]bool = map[string]bool{
+	".txt": true,
+	".m3u": true,
+}
+
 type ImageService struct {
 	imagePaths map[string]fyne.URI
+	knownPaths map[string]fyne.URI
 	current    int
 	playlist   []string
 	Zoomable   *models.ZoomableImage
@@ -33,6 +40,7 @@ type ImageService struct {
 func NewImageService() *ImageService {
 	is := &ImageService{}
 	is.imagePaths = make(map[string]fyne.URI)
+	is.knownPaths = make(map[string]fyne.URI)
 	is.current = 0
 	is.playlist = make([]string, 0)
 	is.Brightness = 1.0
@@ -40,12 +48,19 @@ func NewImageService() *ImageService {
 	return is
 }
 
-func (is *ImageService) AddURI(uri fyne.URI) {
+func (is *ImageService) AddURI(uri fyne.URI) []fyne.URI {
 	ext := uri.Extension()
+	if !utils.IsFile(uri) {
+		return nil
+	}
 	if _, ok := AcceptedExtensions[ext]; ok {
 		is.imagePaths[uri.Path()] = uri
-		return
+		return nil
+	} else if _, ok := PlaylistExtensions[ext]; ok {
+		uris := utils.GetURIsFromLines(utils.ReadLines(uri))
+		return uris
 	}
+	return nil
 }
 
 func (is *ImageService) RecalculatePlaylist() {
@@ -69,23 +84,52 @@ func (is *ImageService) RecalculatePlaylist() {
 	is.playlist = playlist
 }
 
-func (is *ImageService) ImportImages(pos fyne.Position, uri []fyne.URI) {
-	for _, u := range uri {
-		if utils.IsDir(u) {
-			paths := utils.RecurseDir(u)
-			for _, p := range paths {
-				is.AddURI(p)
-			}
-			continue
-		}
-		is.AddURI(u)
+func (is *ImageService) handleImport(u fyne.URI) []fyne.URI {
+	overflow := []fyne.URI{}
+	if is.knownPaths[u.Path()] != nil {
+		return overflow
 	}
+	is.knownPaths[u.Path()] = u
+	if utils.IsDir(u) {
+		paths := utils.RecurseDir(u)
+		for _, p := range paths {
+			if is.knownPaths[p.Path()] != nil {
+				continue
+			}
+			is.knownPaths[p.Path()] = p
+			overflow = append(overflow, is.AddURI(p)...)
+		}
+		return overflow
+	}
+
+	if utils.IsFile(u) {
+		overflow = append(overflow, is.AddURI(u)...)
+	}
+	return overflow
+}
+
+func (is *ImageService) ImportImages(uri []fyne.URI) {
+	overflow := []fyne.URI{}
+	for _, u := range uri {
+		overflow = append(overflow, is.handleImport(u)...)
+	}
+	for len(overflow) > 0 {
+		newOverflow := []fyne.URI{}
+		for _, u := range overflow {
+			newOverflow = append(newOverflow, is.handleImport(u)...)
+		}
+		overflow = newOverflow
+	}
+
 	is.RecalculatePlaylist()
 }
 
 func (is *ImageService) GetCurrent() fyne.URI {
 	if is.current < 0 {
 		is.current = 0
+	}
+	if len(is.playlist) == 0 {
+		return nil
 	}
 	if is.current >= len(is.playlist) {
 		is.current = len(is.playlist) - 1
@@ -111,6 +155,7 @@ func (is *ImageService) Previous() fyne.URI {
 
 func (is *ImageService) Clear() {
 	is.imagePaths = make(map[string]fyne.URI)
+	is.knownPaths = make(map[string]fyne.URI)
 	is.current = 0
 	is.playlist = make([]string, 0)
 }
@@ -129,7 +174,7 @@ func (is *ImageService) Update(w fyne.Window, ps *PlayerService, restartDelay bo
 		oldOffsetX = is.Zoomable.OffsetX
 		oldOffsetY = is.Zoomable.OffsetY
 	}
-	w.SetContent(is.GetImageContainer(w, ps))
+	is.UpdateImageContainer(w, ps)
 	is.Zoomable.Scale = oldScale
 	is.Zoomable.OffsetX = oldOffsetX
 	is.Zoomable.OffsetY = oldOffsetY
@@ -140,20 +185,25 @@ func (is *ImageService) Update(w fyne.Window, ps *PlayerService, restartDelay bo
 	}
 }
 
-func (is *ImageService) GetImageContainer(w fyne.Window, ps *PlayerService) *fyne.Container {
+func (is *ImageService) UpdateImageContainer(w fyne.Window, ps *PlayerService) {
 	img := is.GetImageFromURI(is.GetCurrent())
 	adjusted := is.AdjustBrightnessAndContrast(img)
 	image := canvas.NewImageFromImage(adjusted)
 	image.FillMode = canvas.ImageFillContain
 	zoomable := models.NewZoomableImage(image)
 	is.Zoomable = zoomable
-	imgContainer := container.NewWithoutLayout(zoomable.Image)
+	imgContainer := container.NewWithoutLayout(is.Zoomable.Image)
 	width := w.Canvas().Size().Width
 	height := w.Canvas().Size().Height
 	imgContainer.Resize(fyne.NewSize(width, height))
-	zoomable.Image.Resize(imgContainer.Size())
+	is.Zoomable.Image.Resize(imgContainer.Size())
 	imgContainer.Move(fyne.NewPos(0, 0))
-	return container.NewStack(imgContainer)
+	result := container.NewStack(imgContainer)
+	w.SetContent(result)
+	actualSize := result.Size()
+	imgContainer.Resize(actualSize)
+	is.Zoomable.Image.Resize(actualSize)
+	imgContainer.Move(fyne.NewPos(0, 0))
 }
 
 func (is *ImageService) GetImageFromURI(uri fyne.URI) image.Image {
@@ -236,9 +286,7 @@ func (is *ImageService) Rotate(w fyne.Window, direction int) {
 	}
 
 	is.Zoomable.Image.Image = rotated
-	is.Zoomable.Scale = 1.0
-	is.Zoomable.OffsetX = 0.0
-	is.Zoomable.OffsetY = 0.0
+	is.Zoomable.Reset()
 	is.Zoomable.Image.Resize(fyne.NewSize(float32(rotated.Bounds().Max.X), float32(rotated.Bounds().Max.Y)))
 	is.Zoomable.Refresh()
 	imgContainer := container.NewWithoutLayout(is.Zoomable.Image)

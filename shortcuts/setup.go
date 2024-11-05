@@ -135,7 +135,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
 		}
 		if input == "Down" {
-			nextDelay := viper.GetFloat64("delay") - 0.5
+			nextDelay := viper.GetFloat64("delay") - 1
 			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			if nextDelay < 1 {
 				nextDelay = 1
@@ -144,7 +144,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
 		}
 		if input == "Shift+Down" {
-			nextDelay := viper.GetFloat64("delay") - 1
+			nextDelay := viper.GetFloat64("delay") - 0.5
 			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			if nextDelay < 1 {
 				nextDelay = 1
@@ -163,28 +163,28 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			is.Update(w, ps, false)
 		}
 		if input == "K" {
-			is.Zoomable.Move(0, 20)
-		}
-		if input == "Shift+K" {
-			is.Zoomable.Move(0, 5)
-		}
-		if input == "H" {
-			is.Zoomable.Move(20, 0)
-		}
-		if input == "Shift+H" {
-			is.Zoomable.Move(5, 0)
-		}
-		if input == "J" {
 			is.Zoomable.Move(0, -20)
 		}
-		if input == "Shift+J" {
+		if input == "Shift+K" {
 			is.Zoomable.Move(0, -5)
 		}
-		if input == "L" {
+		if input == "H" {
 			is.Zoomable.Move(-20, 0)
 		}
-		if input == "Shift+L" {
+		if input == "Shift+H" {
 			is.Zoomable.Move(-5, 0)
+		}
+		if input == "J" {
+			is.Zoomable.Move(0, 20)
+		}
+		if input == "Shift+J" {
+			is.Zoomable.Move(0, 5)
+		}
+		if input == "L" {
+			is.Zoomable.Move(20, 0)
+		}
+		if input == "Shift+L" {
+			is.Zoomable.Move(5, 0)
 		}
 		if input == "=" || input == "+" {
 			is.Zoomable.Zoom(0.5)

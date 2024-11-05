@@ -41,7 +41,7 @@ func main() {
 	}
 
 	a := app.New()
-	a.Settings().SetTheme(theme.DarkTheme())
+	a.Settings().SetTheme(theme.DarkTheme()) // TODO: create custom dark theme as theme.DarkTheme() is deprecated
 	w := a.NewWindow("flxvwr")
 
 	w.Resize(fyne.NewSize(800, 600))
@@ -65,9 +65,10 @@ func main() {
 	shortcuts.SetupShortcuts(a, w, ImageService, PlayerService, NotificationService)
 
 	ticker := time.NewTicker(100 * time.Millisecond)
-	handleResize := func() {
+	handleResize := utils.Debounce(func() {
 		ImageService.Update(w, PlayerService, false)
-	}
+	}, 100*time.Millisecond)
+
 	currentWidth := w.Canvas().Size().Width
 	currentHeight := w.Canvas().Size().Height
 	go func() {
@@ -88,11 +89,26 @@ func main() {
 
 	w.SetContent(views.StartView(a))
 
-	w.SetOnDropped(func(pos fyne.Position, uri []fyne.URI) {
-		ImageService.ImportImages(pos, uri)
-		ImageService.Update(w, PlayerService, true)
-		PlayerService.LastSet = time.Now()
-		PlayerService.IsPlaying = true
+	args := utils.GetArgs()
+
+	w.SetOnDropped(func(pos fyne.Position, uris []fyne.URI) {
+		ImageService.ImportImages(uris)
+		if ImageService.GetCurrent() != nil {
+			ImageService.Update(w, PlayerService, true)
+			PlayerService.LastSet = time.Now()
+			PlayerService.IsPlaying = true
+		}
 	})
+
+	if len(args) > 0 {
+		uris := utils.GetURIsFromLines(args)
+		ImageService.ImportImages(uris)
+		if ImageService.GetCurrent() != nil {
+			ImageService.Update(w, PlayerService, true)
+			PlayerService.LastSet = time.Now()
+			PlayerService.IsPlaying = true
+		}
+	}
+
 	w.ShowAndRun()
 }
