@@ -15,6 +15,10 @@ var getLinuxConfigDir = func() (string, error) {
 	return os.UserConfigDir()
 }
 
+var mkdirAll = func(path string, perm os.FileMode) error {
+	return os.MkdirAll(path, perm)
+}
+
 func GetConfigPath() (string, error) {
 	var configPath string
 	o := getOS()
@@ -34,7 +38,9 @@ func GetConfigPath() (string, error) {
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		os.MkdirAll(configPath, os.ModePerm)
+		if err := mkdirAll(configPath, os.ModePerm); err != nil {
+			return "", fmt.Errorf("failed to create config dir: %w", err)
+		}
 	}
 
 	return configPath, nil
