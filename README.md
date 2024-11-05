@@ -102,7 +102,7 @@ macOS (Homebrew Cask) and Windows (Chocolatey Package) coming soon.
 
 ## Usage
 
-Launch flxvwr, drag&drop images, directories and/or playlist files into the window, and start viewing. Use the keyboard shortcuts to navigate between images and manage the viewer. Directories are recursively scanned for images, and you can clear the current playlist using `C` or toggle shuffle mode using `S` for a random viewing experience.
+Launch flxvwr, drag&drop images, directories and/or playlist files into the window, and start viewing. Use the keyboard shortcuts to navigate between images and manage the viewer. Directories and playlist files are recursively scanned for images, and you can clear the current playlist using `C` or toggle shuffle mode using `S` for a random viewing experience.
 
 ## Playlist Files
 
