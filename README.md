@@ -3,7 +3,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/justjcurtis/flxvwr)](https://goreportcard.com/report/github.com/justjcurtis/flxvwr)
 [![License](https://img.shields.io/github/license/justjcurtis/flxvwr)](https://github.com/justjcurtis/flxvwr/blob/main/Licence.md)
 
-This project is a simple, cross-platform image viewer written in Go using the [Fyne](https://fyne.io/) toolkit. The application provides a minimal user interface, keyboard shortcuts for navigation, and smooth performance across platforms including Windows, macOS, and Linux.
+This project is a simple, cross-platform image viewer written in Go using the [Fyne](https://fyne.io/) toolkit. flxvwr provides a minimal user interface, keyboard shortcuts for navigation, and smooth performance across platforms including Windows, macOS, and Linux.
 
 ## Features
 
@@ -11,6 +11,13 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 - **Simple UI**: Minimalistic interface for a clean viewing experience.
 - **Keyboard Shortcuts**: Navigate through images and control the viewer with intuitive key bindings.
 - **Responsive**: Built with Fyne, enabling a responsive and native look on all platforms.
+- **Performance**: Smooth performance for viewing images with minimal overhead with no image count limit.
+- **Customisable**: Adjust brightness, contrast, zoom, pan and rotation.
+- **Playlist**: Drag&drop images, directories or playlist files to import for viewing.
+    - **Recursive Scan**: Recursively scan directories and playlist files for images, directories and playlist files to import.
+    - **Clear Playlist**: Clear the current playlist to start fresh.
+- **Shuffle Mode**: Toggle shuffle mode to view images in a random order.
+- **Delay**: Adjust the delay between images for a custom viewing experience.
 
 ## Screenshots
 
@@ -20,8 +27,8 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 
 ## Keyboard Shortcuts
 
-- **Q**: Quit the application
-- **Esc**: Quit all instances of the application
+- **Q**: Quit flxvwr
+- **Esc**: Quit all instances of flxvwr
 - **C**: Clear the current playlist
 - **Space**: Play/Pause the current playlist
 - **Left/Right Arrow**: Go to the previous/next item
@@ -37,6 +44,39 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 - **/**: Open settings
 
 ## Installation
+
+### Via Package Manager
+
+#### Arch Linux [(AUR Package)](https://aur.archlinux.org/packages/flxvwr-bin)
+
+1. **Install flxvwr**:
+    ```bash
+    yay -S flxvwr-bin
+    ```
+2. **Run flxvwr**:
+    ```bash
+    flxvwr
+    ```
+    **or**
+
+    `Search for and start flxvwr from your application launcher.`
+
+#### MacOS and Windows
+
+macOS (Homebrew Cask) and Windows (Chocolatey Package) coming soon.
+
+### Via Release Download (Windows, macOS, Linux)
+
+1. **Download the latest release**:
+
+    Download the latest release for your os from the [releases page](https://github.com/justjcurtis/flxvwr/releases/latest).
+
+2. Install the release:
+    - **Windows**: Run the installer and follow the instructions.
+    - **macOS**: Open the `.dmg` file and drag the app to your Applications folder.
+    - **Linux**: Install the tar.xz file as you would any other package. (eg. extract, cd into the directory, sudo make install)
+
+### Via `go install` (Linux, macOS, Windows)
 
 1. **Get Go**:
 
@@ -54,27 +94,43 @@ This project is a simple, cross-platform image viewer written in Go using the [F
     go install github.com/justjcurtis/flxvwr@latest
     ```
 
-4. **Run the application**
+4. **Run flxvwr**
    ```bash
    flxvwr
    ```
 
+
 ## Usage
 
-Launch the application, drag&drop images or directories into the window, and start viewing. Use the keyboard shortcuts to navigate between images and manage the viewer. Directories are recursively scanned for images, and you can clear the current playlist using `C` or toggle shuffle mode using `S` for a random viewing experience.
+Launch flxvwr, drag&drop images, directories and/or playlist files into the window, and start viewing. Use the keyboard shortcuts to navigate between images and manage the viewer. Directories are recursively scanned for images, and you can clear the current playlist using `C` or toggle shuffle mode using `S` for a random viewing experience.
+
+## Playlist Files
+
+- Playlist files are `.txt` files containing a newline separated list of filepaths. 
+- These filepaths can be images, directories and other playlist files. flxvwr will recursively scan directories and playlist files for images to import.
+- Any lines in the playlist file that are not valid filepaths that point to an existing file/directory will be ignored.
+- Even if a playlist file refers to itself or it's parent directory, for example, flxvwr will handle this gracefully and prevent infinite recursion.
+
+## Supported File Types
+
+- **JPEG/JPG**
+- **PNG**
+- **TXT**
+- **Directory**
 
 ## Roadmap
 
+- **Add proper .m3u playlist support**: Add support for .m3u playlist files.
 - **Publish Releases**: Publish releases to ~~AUR~~, Homebrew, and Chocolatey.
 - **Playlist Management**: Add support for creating, saving, and loading playlists.
 - **Customisable Key Bindings**: Allow users to customise key bindings for navigation and controls.
 - **Image Metadata**: Display image metadata such as resolution, file size, and format.
 - **Image Sorting**: Sort images by name, date, or size.
 - **Image Filtering**: Filter images by file type or resolution.
-- **Plugins**: Add support for Lua plugins to extend the application's functionality.
+- **Plugins**: Add support for Lua plugins to extend flxvwr's functionality.
     - **Package Manager**: Implement a package manager for installing and managing plugins.
 - **Thumbnail View**: Display a grid of image thumbnails for quicker navigation.
-- **UI Tests**: Write tests to ensure the application functions as expected.
+- **UI Tests**: Write tests to ensure flxvwr functions as expected.
 
 ## Contributing
 
