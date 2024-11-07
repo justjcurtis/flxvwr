@@ -2,8 +2,6 @@ package services
 
 import (
 	"image"
-	"image/color"
-	"math"
 	"os"
 	"time"
 
@@ -33,8 +31,6 @@ type ImageService struct {
 	current    int
 	playlist   []string
 	Zoomable   *models.ZoomableImage
-	Brightness float64
-	Contrast   float64
 }
 
 func NewImageService() *ImageService {
@@ -43,8 +39,6 @@ func NewImageService() *ImageService {
 	is.knownPaths = make(map[string]fyne.URI)
 	is.current = 0
 	is.playlist = make([]string, 0)
-	is.Brightness = 1.0
-	is.Contrast = 1.0
 	return is
 }
 
@@ -164,42 +158,44 @@ func (is *ImageService) Update(w fyne.Window, ps *PlayerService, restartDelay bo
 	if len(is.playlist) == 0 {
 		return
 	}
-
-	var oldScale float32 = 1.0
-	var oldOffsetX float32 = 0.0
-	var oldOffsetY float32 = 0.0
-
-	if is.Zoomable != nil {
-		oldScale = is.Zoomable.Scale
-		oldOffsetX = is.Zoomable.OffsetX
-		oldOffsetY = is.Zoomable.OffsetY
-	}
-	is.UpdateImageContainer(w, ps)
-	is.Zoomable.Scale = oldScale
-	is.Zoomable.OffsetX = oldOffsetX
-	is.Zoomable.OffsetY = oldOffsetY
-	is.Zoomable.Refresh()
-
+	is.updateImageContainer(w)
 	if restartDelay {
 		ps.LastSet = time.Now()
+		if is.Zoomable != nil {
+			is.Zoomable.Reset()
+		}
 	}
 }
 
-func (is *ImageService) UpdateImageContainer(w fyne.Window, ps *PlayerService) {
+func (is *ImageService) updateImageContainer(w fyne.Window) {
+	// Create a new image from the current URI
 	img := is.GetImageFromURI(is.GetCurrent())
-	adjusted := is.AdjustBrightnessAndContrast(img)
-	image := canvas.NewImageFromImage(adjusted)
+	image := canvas.NewImageFromImage(img)
 	image.FillMode = canvas.ImageFillContain
-	zoomable := models.NewZoomableImage(image)
-	is.Zoomable = zoomable
+
+	// Create / Update the ZoomableImage
+	if is.Zoomable != nil {
+		is.Zoomable.Image = image
+		is.Zoomable.Refresh()
+	} else {
+		is.Zoomable = models.NewZoomableImage(image, w)
+	}
+
+	// Create a new container for the image
 	imgContainer := container.NewWithoutLayout(is.Zoomable.Image)
+
+	// Resize the image container to the window size
 	width := w.Canvas().Size().Width
 	height := w.Canvas().Size().Height
 	imgContainer.Resize(fyne.NewSize(width, height))
 	is.Zoomable.Image.Resize(imgContainer.Size())
 	imgContainer.Move(fyne.NewPos(0, 0))
+
+	// Set the content of the window to the image container
 	result := container.NewStack(imgContainer)
 	w.SetContent(result)
+
+	// Update sizes and positions post w.SetContent
 	actualSize := result.Size()
 	imgContainer.Resize(actualSize)
 	is.Zoomable.Image.Resize(actualSize)
@@ -217,84 +213,4 @@ func (is *ImageService) GetImageFromURI(uri fyne.URI) image.Image {
 		panic(err)
 	}
 	return img
-}
-
-func (is *ImageService) AdjustBrightnessAndContrast(img image.Image) image.Image {
-	bounds := img.Bounds()
-	adjusted := image.NewRGBA(bounds)
-
-	// Loop through each pixel
-	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-		for x := bounds.Min.X; x < bounds.Max.X; x++ {
-			originalColor := color.RGBAModel.Convert(img.At(x, y)).(color.RGBA)
-
-			// Adjust brightness
-			r := float64(originalColor.R) * is.Brightness
-			g := float64(originalColor.G) * is.Brightness
-			b := float64(originalColor.B) * is.Brightness
-
-			// Adjust contrast
-			r = (r-128)*is.Contrast + 128
-			g = (g-128)*is.Contrast + 128
-			b = (b-128)*is.Contrast + 128
-
-			// Clamp color values to [0, 255] range
-			adjustedColor := color.RGBA{
-				R: uint8(math.Min(math.Max(r, 0), 255)),
-				G: uint8(math.Min(math.Max(g, 0), 255)),
-				B: uint8(math.Min(math.Max(b, 0), 255)),
-				A: originalColor.A,
-			}
-			adjusted.Set(x, y, adjustedColor)
-		}
-	}
-	return adjusted
-}
-
-func (is *ImageService) Rotate(w fyne.Window, direction int) {
-	if is.Zoomable == nil {
-		return
-	}
-	img := is.Zoomable.Image.Image
-	bounds := img.Bounds()
-	var rotated *image.RGBA
-
-	switch direction % 4 {
-	case 1:
-		rotated = image.NewRGBA(image.Rect(0, 0, bounds.Dy(), bounds.Dx()))
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-			for x := bounds.Min.X; x < bounds.Max.X; x++ {
-				rotated.Set(bounds.Max.Y-y-1, x, img.At(x, y))
-			}
-		}
-	case 2:
-		rotated = image.NewRGBA(image.Rect(0, 0, bounds.Dx(), bounds.Dy()))
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-			for x := bounds.Min.X; x < bounds.Max.X; x++ {
-				rotated.Set(bounds.Max.X-x-1, bounds.Max.Y-y-1, img.At(x, y))
-			}
-		}
-	case 3:
-		rotated = image.NewRGBA(image.Rect(0, 0, bounds.Dy(), bounds.Dx()))
-		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
-			for x := bounds.Min.X; x < bounds.Max.X; x++ {
-				rotated.Set(y, bounds.Max.X-x-1, img.At(x, y))
-			}
-		}
-	default:
-		return
-	}
-
-	is.Zoomable.Image.Image = rotated
-	is.Zoomable.Reset()
-	is.Zoomable.Image.Resize(fyne.NewSize(float32(rotated.Bounds().Max.X), float32(rotated.Bounds().Max.Y)))
-	is.Zoomable.Refresh()
-	imgContainer := container.NewWithoutLayout(is.Zoomable.Image)
-	width := w.Canvas().Size().Width
-	height := w.Canvas().Size().Height
-	imgContainer.Resize(fyne.NewSize(width, height))
-	is.Zoomable.Image.Resize(imgContainer.Size())
-	imgContainer.Move(fyne.NewPos(0, 0))
-	container.NewStack(imgContainer)
-	w.SetContent(imgContainer)
 }

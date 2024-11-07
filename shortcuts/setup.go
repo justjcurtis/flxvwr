@@ -157,92 +157,151 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			settingsWindow.Show()
 		}
 		if input == "R" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Reset()
-			is.Brightness = 1
-			is.Contrast = 1
 			is.Update(w, ps, false)
 		}
 		if input == "K" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(0, -20)
 		}
 		if input == "Shift+K" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(0, -5)
 		}
 		if input == "H" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(-20, 0)
 		}
 		if input == "Shift+H" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(-5, 0)
 		}
 		if input == "J" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(0, 20)
 		}
 		if input == "Shift+J" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(0, 5)
 		}
 		if input == "L" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(20, 0)
 		}
 		if input == "Shift+L" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Move(5, 0)
 		}
 		if input == "=" || input == "+" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Zoom(0.5)
 		}
 		if input == "Shift+=" || input == "Shift++" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Zoom(0.2)
 		}
 		if input == "-" || input == "_" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Zoom(-0.5)
 		}
 		if input == "Shift+-" || input == "Shift+_" {
+			if is.Zoomable == nil {
+				return
+			}
 			is.Zoomable.Zoom(-0.2)
 		}
 		if input == "[" {
-			is.Rotate(w, 3)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.Rotate(3)
 		}
 		if input == "]" {
-			is.Rotate(w, 1)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.Rotate(1)
 		}
 		if input == "B" {
-			is.Brightness -= 0.05
-			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(-0.05, 0)
+			ns.SetNotification("Brightness " + strconv.FormatFloat(float64(is.Zoomable.Brightness*100), 'f', 0, 32) + "%")
 		}
 		if input == "Shift+B" {
-			is.Brightness -= 0.01
-			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(-0.01, 0)
+			ns.SetNotification("Brightness " + strconv.FormatFloat(float64(is.Zoomable.Brightness*100), 'f', 0, 32) + "%")
 		}
 		if input == "N" {
-			is.Brightness += 0.05
-			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(0.05, 0)
+			ns.SetNotification("Brightness " + strconv.FormatFloat(float64(is.Zoomable.Brightness*100), 'f', 0, 32) + "%")
 		}
 		if input == "Shift+N" {
-			is.Brightness += 0.01
-			ns.SetNotification("Brightness " + strconv.FormatFloat(is.Brightness*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(0.01, 0)
+			ns.SetNotification("Brightness " + strconv.FormatFloat(float64(is.Zoomable.Brightness*100), 'f', 0, 32) + "%")
 		}
 		if input == "V" {
-			is.Contrast -= 0.05
-			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(0, -0.05)
+			ns.SetNotification("Contrast " + strconv.FormatFloat(float64(is.Zoomable.Contrast*100), 'f', 0, 32) + "%")
 		}
 		if input == "Shift+V" {
-			is.Contrast -= 0.01
-			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(0, 0.01)
+			ns.SetNotification("Contrast " + strconv.FormatFloat(float64(is.Zoomable.Contrast*100), 'f', 0, 32) + "%")
 		}
 		if input == "M" {
-			is.Contrast += 0.05
-			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(0, 0.05)
+			ns.SetNotification("Contrast " + strconv.FormatFloat(float64(is.Zoomable.Contrast*100), 'f', 0, 32) + "%")
 		}
 		if input == "Shift+M" {
-			is.Contrast += 0.01
-			ns.SetNotification("Contrast " + strconv.FormatFloat(is.Contrast*100, 'f', 0, 64) + "%")
-			is.Update(w, ps, false)
+			if is.Zoomable == nil {
+				return
+			}
+			is.Zoomable.AdjustBrightnessAndContrast(0, 0.01)
+			ns.SetNotification("Contrast " + strconv.FormatFloat(float64(is.Zoomable.Contrast*100), 'f', 0, 32) + "%")
 		}
 	})
 }
