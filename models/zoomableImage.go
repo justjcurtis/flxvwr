@@ -37,6 +37,10 @@ func NewZoomableImage(image *canvas.Image, w fyne.Window) *ZoomableImage {
 	}
 }
 
+func (z *ZoomableImage) HasChanged() bool {
+	return z.prevScale != z.Scale || z.OffsetX != 0.0 || z.OffsetY != 0.0 || z.Brightness != 1.0 || z.Contrast != 1.0 || z.Rotation != 0
+}
+
 func (z *ZoomableImage) ToString() string {
 	return fmt.Sprintf("%f,%f,%f,%f,%f,%f,%d", z.prevScale, z.Scale, z.OffsetX, z.OffsetY, z.Brightness, z.Contrast, z.Rotation)
 }
@@ -58,17 +62,33 @@ func FromString(str string, image *canvas.Image, w fyne.Window) *ZoomableImage {
 }
 
 func (z *ZoomableImage) Set(str string) {
+	fmt.Println(str)
 	fmt.Sscanf(str, "%f,%f,%f,%f,%f,%f,%d", &z.prevScale, &z.Scale, &z.OffsetX, &z.OffsetY, &z.Brightness, &z.Contrast, &z.Rotation)
 	z.Refresh()
 }
 
 func (z *ZoomableImage) Reset() {
+	z.ResetBrightnessContrast()
+	z.ResetZoomAndPan()
+	z.ResetRotation()
+	z.Refresh()
+}
+
+func (z *ZoomableImage) ResetRotation() {
+	z.Rotation = 0
+	z.Refresh()
+}
+
+func (z *ZoomableImage) ResetBrightnessContrast() {
+	z.Brightness = 1.0
+	z.Contrast = 1.0
+	z.Refresh()
+}
+
+func (z *ZoomableImage) ResetZoomAndPan() {
 	z.Scale = 1.0
 	z.OffsetX, z.OffsetY = 0.0, 0.0
 	z.prevScale = 1.0
-	z.Rotation = 0
-	z.Brightness = 1.0
-	z.Contrast = 1.0
 	z.Refresh()
 }
 
@@ -109,6 +129,9 @@ func (z *ZoomableImage) Move(dx, dy float32) {
 }
 
 func (z *ZoomableImage) Rotate(direction int) {
+	z.Rotation += direction
+	z.Rotation = (z.Rotation + 4) % 4
+	fmt.Println(z.Rotation)
 	img := z.Image.Image
 	bounds := img.Bounds()
 	var rotated *image.RGBA
@@ -143,7 +166,7 @@ func (z *ZoomableImage) Rotate(direction int) {
 	}
 
 	z.Image.Image = rotated
-	z.Reset()
+	z.ResetZoomAndPan()
 	z.Image.Resize(fyne.NewSize(float32(rotated.Bounds().Max.X), float32(rotated.Bounds().Max.Y)))
 	z.Refresh()
 	imgContainer := container.NewWithoutLayout(z.Image)
@@ -152,8 +175,13 @@ func (z *ZoomableImage) Rotate(direction int) {
 	imgContainer.Resize(fyne.NewSize(width, height))
 	z.Image.Resize(imgContainer.Size())
 	imgContainer.Move(fyne.NewPos(0, 0))
-	container.NewStack(imgContainer)
-	z.window.SetContent(imgContainer)
+	result := container.NewStack(imgContainer)
+	z.window.SetContent(result)
+	actualSize := result.Size()
+	imgContainer.Resize(actualSize)
+	z.Image.Resize(actualSize)
+	imgContainer.Move(fyne.NewPos(0, 0))
+
 }
 
 func (z *ZoomableImage) AdjustBrightnessAndContrast(db, dc float32) {
