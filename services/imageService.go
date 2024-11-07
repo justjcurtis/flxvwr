@@ -3,16 +3,17 @@ package services
 import (
 	"fmt"
 	"image"
+	"log"
 	"os"
 	"time"
 
 	"github.com/justjcurtis/flxvwr/models"
 	"github.com/justjcurtis/flxvwr/utils"
+	"github.com/spf13/viper"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"github.com/spf13/viper"
 )
 
 var AcceptedExtensions map[string]bool = map[string]bool{
@@ -27,12 +28,13 @@ var PlaylistExtensions map[string]bool = map[string]bool{
 }
 
 type ImageService struct {
-	imagePaths  map[string]fyne.URI
-	knownPaths  map[string]fyne.URI
-	imageStates map[string]string
-	current     int
-	playlist    []string
-	Zoomable    *models.ZoomableImage
+	imagePaths      map[string]fyne.URI
+	knownPaths      map[string]fyne.URI
+	imageStates     map[string]string
+	current         int
+	Zoomable        *models.ZoomableImage
+	currentPlaylist int
+	playlists       [][]string
 }
 
 func NewImageService() *ImageService {
@@ -41,7 +43,11 @@ func NewImageService() *ImageService {
 	is.knownPaths = make(map[string]fyne.URI)
 	is.imageStates = make(map[string]string)
 	is.current = 0
-	is.playlist = make([]string, 0)
+	is.currentPlaylist = 0
+	is.playlists = make([][]string, 10)
+	for i := 0; i < 10; i++ {
+		is.playlists[i] = make([]string, 0)
+	}
 	return is
 }
 
@@ -52,6 +58,7 @@ func (is *ImageService) AddURI(uri fyne.URI) []fyne.URI {
 	}
 	if _, ok := AcceptedExtensions[ext]; ok {
 		is.imagePaths[uri.Path()] = uri
+		is.playlists[is.currentPlaylist] = append(is.playlists[is.currentPlaylist], uri.Path())
 		return nil
 	} else if _, ok := PlaylistExtensions[ext]; ok {
 		uris := utils.GetURIsFromLines(utils.ReadLines(uri))
@@ -60,25 +67,8 @@ func (is *ImageService) AddURI(uri fyne.URI) []fyne.URI {
 	return nil
 }
 
-func (is *ImageService) RecalculatePlaylist() {
-	currentPath := ""
-	if len(is.playlist) > 0 {
-		currentPath = is.playlist[is.current]
-	}
-	playlist := make([]string, 0, len(is.imagePaths))
-	index := 0
-	for k := range is.imagePaths {
-		if k == currentPath {
-			is.current = index
-		}
-		playlist = append(playlist, k)
-		index++
-	}
-	shouldShuffle := viper.GetBool("shuffle")
-	if shouldShuffle {
-		playlist = utils.Shuffle(playlist, 3)
-	}
-	is.playlist = playlist
+func (is *ImageService) GetCurrentPlaylist() []string {
+	return is.playlists[is.currentPlaylist]
 }
 
 func (is *ImageService) handleImport(u fyne.URI) []fyne.URI {
@@ -117,17 +107,46 @@ func (is *ImageService) ImportImages(uri []fyne.URI) {
 		}
 		overflow = newOverflow
 	}
+	is.RecalculateCurrentPlaylist()
+}
 
-	is.RecalculatePlaylist()
+func (is *ImageService) SetPlaylist(playlist int) {
+	is.currentPlaylist = playlist
+	is.current = 0
+}
+
+func (is *ImageService) RecalculateCurrentPlaylist() {
+	currentPath := ""
+	if len(is.playlists[is.currentPlaylist]) > 0 {
+		currentPath = is.CurrentPath()
+	}
+	shouldShuffle := viper.GetBool("shuffle")
+	if shouldShuffle {
+		utils.Shuffle(is.playlists[is.currentPlaylist], 3)
+	} else {
+		utils.SortStrings(is.playlists[is.currentPlaylist])
+	}
+	if currentPath != "" {
+		for i, p := range is.playlists[is.currentPlaylist] {
+			if p == currentPath {
+				is.current = i
+				break
+			}
+		}
+	}
+}
+
+func (is *ImageService) CurrentPath() string {
+	return is.playlists[is.currentPlaylist][is.current]
 }
 
 func (is *ImageService) cacheZoomableImage() {
 	if is.Zoomable != nil {
 		if is.Zoomable.HasChanged() {
-			is.imageStates[is.playlist[is.current]] = is.Zoomable.ToString()
+			is.imageStates[is.CurrentPath()] = is.Zoomable.ToString()
 			return
 		}
-		is.imageStates[is.playlist[is.current]] = ""
+		is.imageStates[is.CurrentPath()] = ""
 	}
 }
 
@@ -135,17 +154,17 @@ func (is *ImageService) GetCurrent() fyne.URI {
 	if is.current < 0 {
 		is.current = 0
 	}
-	if len(is.playlist) == 0 {
+	if len(is.GetCurrentPlaylist()) == 0 {
 		return nil
 	}
-	if is.current >= len(is.playlist) {
-		is.current = len(is.playlist) - 1
+	if is.current >= len(is.GetCurrentPlaylist()) {
+		is.current = len(is.GetCurrentPlaylist()) - 1
 	}
-	return is.imagePaths[is.playlist[is.current]]
+	return is.imagePaths[is.CurrentPath()]
 }
 
 func (is *ImageService) Next() fyne.URI {
-	if len(is.playlist) == 0 {
+	if len(is.GetCurrentPlaylist()) == 0 {
 		return nil
 	}
 
@@ -153,14 +172,14 @@ func (is *ImageService) Next() fyne.URI {
 		is.cacheZoomableImage()
 	}
 	is.current++
-	if is.current >= len(is.playlist) {
+	if is.current >= len(is.GetCurrentPlaylist()) {
 		is.current = 0
 	}
 	return is.GetCurrent()
 }
 
 func (is *ImageService) Previous() fyne.URI {
-	if len(is.playlist) == 0 {
+	if len(is.GetCurrentPlaylist()) == 0 {
 		return nil
 	}
 	if is.Zoomable != nil {
@@ -169,7 +188,7 @@ func (is *ImageService) Previous() fyne.URI {
 
 	is.current--
 	if is.current < 0 {
-		is.current = len(is.playlist) - 1
+		is.current = len(is.GetCurrentPlaylist()) - 1
 	}
 	return is.GetCurrent()
 }
@@ -179,13 +198,16 @@ func (is *ImageService) Clear() {
 	is.knownPaths = make(map[string]fyne.URI)
 	is.imageStates = make(map[string]string)
 	is.current = 0
-	is.playlist = make([]string, 0)
+	is.currentPlaylist = 0
+	for i := 0; i < 10; i++ {
+		is.playlists[i] = make([]string, 0)
+	}
 }
 
 func (is *ImageService) restoreZoomableState() {
 	if is.Zoomable != nil {
-		if is.imageStates[is.playlist[is.current]] != "" {
-			is.Zoomable.Set(is.imageStates[is.playlist[is.current]])
+		if is.imageStates[is.CurrentPath()] != "" {
+			is.Zoomable.Set(is.imageStates[is.CurrentPath()])
 			if is.Zoomable.Brightness != 1.0 || is.Zoomable.Contrast != 1.0 {
 				db := (1.0 - is.Zoomable.Brightness) * -1
 				dc := (1.0 - is.Zoomable.Contrast) * -1
@@ -195,8 +217,8 @@ func (is *ImageService) restoreZoomableState() {
 				fmt.Println(is.Zoomable.Rotation)
 				is.Zoomable.Rotate(is.Zoomable.Rotation)
 			}
-			is.Zoomable.Set(is.imageStates[is.playlist[is.current]])
-			fmt.Println(is.imageStates[is.playlist[is.current]])
+			is.Zoomable.Set(is.imageStates[is.CurrentPath()])
+			fmt.Println(is.imageStates[is.CurrentPath()])
 			is.Zoomable.Refresh()
 		} else {
 			is.Zoomable.Reset()
@@ -205,14 +227,14 @@ func (is *ImageService) restoreZoomableState() {
 }
 
 func (is *ImageService) Update(w fyne.Window, ps *PlayerService, restartDelay bool) {
-	if len(is.playlist) == 0 {
+	if len(is.GetCurrentPlaylist()) == 0 {
 		return
 	}
 	is.updateImageContainer(w)
 	if restartDelay {
 		ps.LastSet = time.Now()
 		if is.Zoomable != nil {
-			if is.imageStates[is.playlist[is.current]] != "" {
+			if is.imageStates[is.CurrentPath()] != "" {
 				is.restoreZoomableState()
 			} else {
 				is.Zoomable.Reset()
@@ -259,12 +281,16 @@ func (is *ImageService) updateImageContainer(w fyne.Window) {
 func (is *ImageService) GetImageFromURI(uri fyne.URI) image.Image {
 	file, err := os.Open(uri.Path())
 	if err != nil {
-		panic(err)
+		log.Println(uri.Path(), err)
+		is.Next()
+		return is.GetImageFromURI(is.GetCurrent())
 	}
 	defer file.Close()
 	img, _, err := image.Decode(file)
 	if err != nil {
-		panic(err)
+		log.Println(uri.Path(), err)
+		is.Next()
+		return is.GetImageFromURI(is.GetCurrent())
 	}
 	return img
 }

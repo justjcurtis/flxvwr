@@ -120,7 +120,7 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			} else {
 				ns.SetNotification("Shuffle Off")
 			}
-			is.RecalculatePlaylist()
+			is.RecalculateCurrentPlaylist()
 		}
 		if input == "Up" {
 			nextDelay := viper.GetFloat64("delay") + 1
@@ -136,19 +136,19 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 		}
 		if input == "Down" {
 			nextDelay := viper.GetFloat64("delay") - 1
-			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
-			if nextDelay < 1 {
-				nextDelay = 1
+			if nextDelay < 0.5 {
+				nextDelay = 0.5
 			}
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			viper.Set("delay", nextDelay)
 			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
 		}
 		if input == "Shift+Down" {
 			nextDelay := viper.GetFloat64("delay") - 0.5
-			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
-			if nextDelay < 1 {
-				nextDelay = 1
+			if nextDelay < 0.5 {
+				nextDelay = 0.5
 			}
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
 			viper.Set("delay", nextDelay)
 			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
 		}

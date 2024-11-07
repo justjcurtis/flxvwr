@@ -57,7 +57,7 @@ func main() {
 			PlayerService.CurrentDelay = newDelay
 		}
 		if newShuffle != viper.GetBool("shuffle") {
-			ImageService.RecalculatePlaylist()
+			ImageService.RecalculateCurrentPlaylist()
 		}
 	})
 	viper.WatchConfig()

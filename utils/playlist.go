@@ -2,6 +2,16 @@ package utils
 
 import "math/rand/v2"
 
+func SortStrings(arr []string) {
+	for i := 0; i < len(arr); i++ {
+		for j := i; j < len(arr); j++ {
+			if arr[i] > arr[j] {
+				arr[i], arr[j] = arr[j], arr[i]
+			}
+		}
+	}
+}
+
 func Shuffle[T any](arr []T, n int) []T {
 	for round := 0; round < n; round++ {
 		for i := range arr {
