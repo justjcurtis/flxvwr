@@ -62,7 +62,6 @@ func FromString(str string, image *canvas.Image, w fyne.Window) *ZoomableImage {
 }
 
 func (z *ZoomableImage) Set(str string) {
-	fmt.Println(str)
 	fmt.Sscanf(str, "%f,%f,%f,%f,%f,%f,%d", &z.prevScale, &z.Scale, &z.OffsetX, &z.OffsetY, &z.Brightness, &z.Contrast, &z.Rotation)
 	z.Refresh()
 }
@@ -131,7 +130,6 @@ func (z *ZoomableImage) Move(dx, dy float32) {
 func (z *ZoomableImage) Rotate(direction int) {
 	z.Rotation += direction
 	z.Rotation = (z.Rotation + 4) % 4
-	fmt.Println(z.Rotation)
 	img := z.Image.Image
 	bounds := img.Bounds()
 	var rotated *image.RGBA

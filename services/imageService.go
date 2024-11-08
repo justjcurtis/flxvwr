@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"image"
 	"log"
 	"os"
@@ -230,11 +229,9 @@ func (is *ImageService) restoreZoomableState() {
 				is.Zoomable.AdjustBrightnessAndContrast(db, dc)
 			}
 			if is.Zoomable.Rotation != 0 {
-				fmt.Println(is.Zoomable.Rotation)
 				is.Zoomable.Rotate(is.Zoomable.Rotation)
 			}
 			is.Zoomable.Set(is.imageStates[is.playlist[is.currentIndex]])
-			fmt.Println(is.imageStates[is.playlist[is.currentIndex]])
 			is.Zoomable.Refresh()
 		} else {
 			is.Zoomable.Reset()
