@@ -303,5 +303,25 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			is.Zoomable.AdjustBrightnessAndContrast(0, 0.01)
 			ns.SetNotification("Contrast " + strconv.FormatFloat(float64(is.Zoomable.Contrast*100), 'f', 0, 32) + "%")
 		}
+		if input == "1" || input == "2" || input == "3" || input == "4" || input == "5" || input == "6" || input == "7" || input == "8" || input == "9" || input == "0" {
+			index, _ := strconv.Atoi(input)
+			is.SetCurrentPlaylist(index)
+			is.Zoomable.Reset()
+			is.Update(w, ps, true)
+			ns.SetNotification("Playlist " + input)
+		}
+		if input == "Shift+1" || input == "Shift+2" || input == "Shift+3" || input == "Shift+4" || input == "Shift+5" || input == "Shift+6" || input == "Shift+7" || input == "Shift+8" || input == "Shift+9" || input == "Shift+0" {
+			index, _ := strconv.Atoi(input[6:])
+			is.AddCurrentToPlaylist(index)
+			is.Zoomable.Reset()
+			is.Update(w, ps, true)
+			ns.SetNotification("Added to playlist " + input)
+		}
+		if input == "X" {
+			is.RemoveCurrentFromPlaylist()
+			is.Zoomable.Reset()
+			is.Update(w, ps, true)
+			ns.SetNotification("Removed")
+		}
 	})
 }
