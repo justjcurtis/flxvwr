@@ -125,7 +125,7 @@ Launch flxvwr, drag&drop images, directories and/or playlist files into the wind
 ## Roadmap
 
 - **Publish Releases**: Publish releases to ~~AUR~~, Homebrew, and Chocolatey.
-- **Playlist Management**: Add support for creating, saving, and loading playlists.
+- **Playlist Management**: Add support for ~~creating~~, saving, and ~~loading~~ playlists.
 - **Customisable Key Bindings**: Allow users to customise key bindings for navigation and controls.
 - **Image Metadata**: Display image metadata such as resolution, file size, and format.
 - **Image Sorting**: Sort images by name, date, or size.
