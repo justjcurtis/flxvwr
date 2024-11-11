@@ -10,6 +10,7 @@ import (
 	"github.com/justjcurtis/flxvwr/views"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/dialog"
 )
 
 var keypressThreshold = 500 * time.Millisecond
@@ -107,6 +108,31 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			ps.Stop()
 			is.Clear()
 			w.SetContent(views.StartView(a))
+		}
+		if input == "E" {
+			if ps.IsPlaying {
+				wasPlaying = true
+				ps.PlayPause()
+				ns.SetNotification("Paused")
+			} else {
+				wasPlaying = false
+			}
+			dialog := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
+				if err != nil {
+					return
+				}
+				if writer == nil {
+					return
+				}
+				defer writer.Close()
+				playlistString := utils.PlaylistToString(is.GetPlaylist())
+				writer.Write([]byte(playlistString))
+				if !ps.IsPlaying && wasPlaying {
+					ns.SetNotification("Playing")
+					ps.PlayPause()
+				}
+			}, w)
+			dialog.Show()
 		}
 		if input == "Right" {
 			isPlaying := ps.IsPlaying

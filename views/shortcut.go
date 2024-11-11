@@ -26,6 +26,7 @@ var ShortcutMap [][]string = [][]string{
 	{"Add current to playlist", "Shift+1 to 9"},
 	{"Switch to playlist", "1 to 9"},
 	{"Remove from playlist", "X"},
+	{"Export/Save current playlist", "E"},
 	{"Show/Hide shortcuts", "F1 | ?"},
 	{"Settings", "/"},
 }

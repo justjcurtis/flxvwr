@@ -44,6 +44,7 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 - **Shift+1 to 9**: Add current image to a numbered playlist slot
 - **1 to 9**: Switch to a numbered playlist slot
 - **X**: Remove current image from the playlist
+- **E**: Export the current playlist to a `.txt` file
 - **F1 | ?**: Show/hide shortcuts
 - **/**: Open settings
 
@@ -125,7 +126,6 @@ Launch flxvwr, drag&drop images, directories and/or playlist files into the wind
 ## Roadmap
 
 - **Publish Releases**: Publish releases to ~~AUR~~, Homebrew, and Chocolatey.
-- **Playlist Management**: Add support for ~~creating~~, saving, and ~~loading~~ playlists.
 - **Customisable Key Bindings**: Allow users to customise key bindings for navigation and controls.
 - **Image Metadata**: Display image metadata such as resolution, file size, and format.
 - **Image Sorting**: Sort images by name, date, or size.

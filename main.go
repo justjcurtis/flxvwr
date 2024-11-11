@@ -20,7 +20,7 @@ var ConfigService *services.ConfigService
 
 func main() {
 
-	a := app.New()
+	a := app.NewWithID("flxvwr")
 	a.Settings().SetTheme(theme.DarkTheme()) // TODO: create custom dark theme as theme.DarkTheme() is deprecated
 	w := a.NewWindow("flxvwr")
 	w.Resize(fyne.NewSize(800, 600))

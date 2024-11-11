@@ -2,6 +2,14 @@ package utils
 
 import "math/rand/v2"
 
+func PlaylistToString(playlist []string) string {
+	str := ""
+	for _, p := range playlist {
+		str += p + "\n"
+	}
+	return str
+}
+
 func SortStrings(arr []string) {
 	for i := 0; i < len(arr); i++ {
 		for j := i; j < len(arr); j++ {

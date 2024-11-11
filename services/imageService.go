@@ -51,6 +51,16 @@ func NewImageService() *ImageService {
 	return is
 }
 
+func (is *ImageService) GetPlaylist() []string {
+	arr := make([]string, len(is.playlists[is.currentPlaylist]))
+	i := 0
+	for _, p := range is.playlists[is.currentPlaylist] {
+		arr[i] = p.Path()
+		i++
+	}
+	return arr
+}
+
 func (is *ImageService) HandleConfigUpdate(config models.Config) {
 	if is.shuffle != config.Shuffle {
 		is.shuffle = config.Shuffle
