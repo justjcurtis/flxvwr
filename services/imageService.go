@@ -34,6 +34,7 @@ type ImageService struct {
 	currentPlaylist int
 	playlist        []string
 	Zoomable        *models.ZoomableImage
+	shuffle         bool
 }
 
 func NewImageService() *ImageService {
@@ -42,11 +43,19 @@ func NewImageService() *ImageService {
 	is.imageStates = make(map[string]string)
 	is.currentIndex = 0
 	is.currentPlaylist = 0
+	is.shuffle = viper.GetBool("shuffle")
 	is.playlists = make([]map[string]fyne.URI, 10)
 	for i := 0; i < 10; i++ {
 		is.playlists[i] = make(map[string]fyne.URI)
 	}
 	return is
+}
+
+func (is *ImageService) HandleConfigUpdate(config models.Config) {
+	if is.shuffle != config.Shuffle {
+		is.shuffle = config.Shuffle
+		is.RecalculateCurrentPlaylist()
+	}
 }
 
 func (is *ImageService) AddURI(uri fyne.URI) []fyne.URI {
@@ -113,7 +122,6 @@ func (is *ImageService) RecalculateCurrentPlaylist() {
 	if len(is.playlist) > 0 {
 		currentPath = is.playlist[is.currentIndex]
 	}
-	shouldShuffle := viper.GetBool("shuffle")
 	playlist := make([]string, len(is.playlists[is.currentPlaylist]))
 	i := 0
 	for _, p := range is.playlists[is.currentPlaylist] {
@@ -121,7 +129,7 @@ func (is *ImageService) RecalculateCurrentPlaylist() {
 		i++
 	}
 
-	if shouldShuffle {
+	if is.shuffle {
 		utils.Shuffle(playlist, 3)
 	} else {
 		utils.SortStrings(playlist)

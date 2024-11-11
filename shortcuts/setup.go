@@ -2,14 +2,14 @@ package shortcuts
 
 import (
 	"fmt"
-	"github.com/justjcurtis/flxvwr/services"
-	"github.com/justjcurtis/flxvwr/utils"
-	"github.com/justjcurtis/flxvwr/views"
 	"strconv"
 	"time"
 
+	"github.com/justjcurtis/flxvwr/services"
+	"github.com/justjcurtis/flxvwr/utils"
+	"github.com/justjcurtis/flxvwr/views"
+
 	"fyne.io/fyne/v2"
-	"github.com/spf13/viper"
 )
 
 var keypressThreshold = 500 * time.Millisecond
@@ -44,8 +44,10 @@ func (m *modifiers) getMods() string {
 	return mods
 }
 
-func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *services.PlayerService, ns *services.NotificationService) {
+func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *services.PlayerService, ns *services.NotificationService, cs *services.ConfigService) {
 	mods := modifiers{}
+	isShowingShortcuts := false
+	wasPlaying := false
 	lastKeyTime := time.Now().Add(-keypressThreshold * 2)
 	w.Canvas().SetOnTypedKey(func(e *fyne.KeyEvent) {
 		if time.Since(lastKeyTime) > keypressThreshold {
@@ -71,6 +73,26 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 
 		input := mods.getMods() + fmt.Sprint(e.Name)
 
+		if input == "Shift+/" || input == "F1" {
+			if !isShowingShortcuts {
+				if ps.IsPlaying {
+					wasPlaying = true
+					ns.SetNotification("Paused")
+					ps.PlayPause()
+				} else {
+					wasPlaying = false
+				}
+				isShowingShortcuts = true
+				w.SetContent(views.StartView(a))
+				return
+			}
+			isShowingShortcuts = false
+			is.Update(w, ps, false)
+			if !ps.IsPlaying && wasPlaying {
+				ns.SetNotification("Playing")
+				ps.PlayPause()
+			}
+		}
 		if input == "Escape" {
 			utils.KillAppInstances("flxvwr")
 			a.Quit()
@@ -113,47 +135,49 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			ps.PlayPause()
 		}
 		if input == "S" {
-			shuffle := viper.GetBool("shuffle")
-			viper.Set("shuffle", !shuffle)
+			shuffle := cs.GetShuffle()
+			cs.SetShuffle(!shuffle)
 			if !shuffle {
 				ns.SetNotification("Shuffle On")
 			} else {
 				ns.SetNotification("Shuffle Off")
 			}
-			is.RecalculateCurrentPlaylist()
 		}
 		if input == "Up" {
-			nextDelay := viper.GetFloat64("delay") + 1
-			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
-			viper.Set("delay", nextDelay)
-			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+			nextDelay := cs.GetDelay() + 1*time.Second
+			cs.SetDelay(nextDelay)
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay.Seconds(), 'f', 1, 64))
 		}
 		if input == "Shift+Up" {
-			nextDelay := viper.GetFloat64("delay") + 0.5
-			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
-			viper.Set("delay", nextDelay)
-			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+			nextDelay := cs.GetDelay() + (500 * time.Millisecond)
+			cs.SetDelay(nextDelay)
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay.Seconds(), 'f', 1, 64))
 		}
 		if input == "Down" {
-			nextDelay := viper.GetFloat64("delay") - 1
-			if nextDelay < 0.5 {
-				nextDelay = 0.5
+			nextDelay := cs.GetDelay() - 1*time.Second
+			if nextDelay < 500*time.Millisecond {
+				nextDelay = 500 * time.Millisecond
 			}
-			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
-			viper.Set("delay", nextDelay)
-			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+			cs.SetDelay(nextDelay)
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay.Seconds(), 'f', 1, 64))
 		}
 		if input == "Shift+Down" {
-			nextDelay := viper.GetFloat64("delay") - 0.5
-			if nextDelay < 0.5 {
-				nextDelay = 0.5
+			nextDelay := cs.GetDelay() - (500 * time.Millisecond)
+			if nextDelay < 500*time.Millisecond {
+				nextDelay = 500 * time.Millisecond
 			}
-			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay, 'f', 1, 64))
-			viper.Set("delay", nextDelay)
-			ps.CurrentDelay = viper.GetDuration("delay") * time.Second
+			cs.SetDelay(nextDelay)
+			ns.SetNotification("Delay " + strconv.FormatFloat(nextDelay.Seconds(), 'f', 1, 64))
 		}
 		if input == "/" {
-			settingsWindow := views.Settings(a)
+			if ps.IsPlaying {
+				wasPlaying = true
+				ps.PlayPause()
+				ns.SetNotification("Paused")
+			} else {
+				wasPlaying = false
+			}
+			settingsWindow := views.Settings(a, cs)
 			settingsWindow.Show()
 		}
 		if input == "R" {

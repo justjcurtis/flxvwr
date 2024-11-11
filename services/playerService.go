@@ -3,6 +3,7 @@ package services
 import (
 	"time"
 
+	"github.com/justjcurtis/flxvwr/models"
 	"github.com/spf13/viper"
 )
 
@@ -20,6 +21,10 @@ func NewPlayerService() *PlayerService {
 		LastSet:      time.Now(),
 		CurrentDelay: delay,
 	}
+}
+
+func (ps *PlayerService) HandleConfigUpdate(config models.Config) {
+	ps.CurrentDelay = config.Delay
 }
 
 func (ps *PlayerService) PlayPause() {

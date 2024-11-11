@@ -23,6 +23,10 @@ var ShortcutMap [][]string = [][]string{
 	{"Brightness +/-", "B/N"},
 	{"Contrast +/-", "V/M"},
 	{"Smaller increments", "Shift+..."},
+	{"Add current to playlist", "Shift+1 to 9"},
+	{"Switch to playlist", "1 to 9"},
+	{"Remove from playlist", "X"},
+	{"Show/Hide shortcuts", "F1 | ?"},
 	{"Settings", "/"},
 }
 

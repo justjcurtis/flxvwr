@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"time"
 
 	"github.com/justjcurtis/flxvwr/services"
@@ -12,57 +12,33 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/theme"
-	"github.com/fsnotify/fsnotify"
-	"github.com/spf13/viper"
 )
 
 var ImageService *services.ImageService
 var PlayerService *services.PlayerService
 var NotificationService *services.NotificationService
+var ConfigService *services.ConfigService
 
 func main() {
-	configPath, err := utils.GetConfigPath()
-	if err != nil {
-		log.Fatal(err)
-	}
-	viper.AddConfigPath(configPath)
-	viper.SetConfigName("config")
-	viper.SetConfigType("json")
-
-	viper.SetDefault("app.name", "flxvwr")
-	viper.SetDefault("app.version", "0.0.1")
-	viper.SetDefault("shuffle", true)
-	viper.SetDefault("delay", 10.0)
-
-	viper.SafeWriteConfig()
-
-	if err := viper.ReadInConfig(); err != nil {
-		log.Println("No config file found, using defaults")
-	}
 
 	a := app.New()
 	a.Settings().SetTheme(theme.DarkTheme()) // TODO: create custom dark theme as theme.DarkTheme() is deprecated
 	w := a.NewWindow("flxvwr")
-
+	fmt.Println("flxvwr starting...")
 	w.Resize(fyne.NewSize(800, 600))
 
+	fmt.Println("Creating services...")
+	ConfigService := services.NewConfigService()
+	fmt.Println("Subscribing to config updates...")
 	ImageService = services.NewImageService()
+	ConfigService.Subscribe(ImageService.HandleConfigUpdate)
 	PlayerService := services.NewPlayerService()
+	ConfigService.Subscribe(PlayerService.HandleConfigUpdate)
 	NotificationService := services.NewNotificationService(w)
+	fmt.Println("finishing services...")
 
-	viper.OnConfigChange(func(e fsnotify.Event) {
-		newDelay := viper.GetDuration("delay") * time.Second
-		newShuffle := viper.GetBool("shuffle")
-		if newDelay != PlayerService.CurrentDelay {
-			PlayerService.CurrentDelay = newDelay
-		}
-		if newShuffle != viper.GetBool("shuffle") {
-			ImageService.RecalculateCurrentPlaylist()
-		}
-	})
-	viper.WatchConfig()
-
-	shortcuts.SetupShortcuts(a, w, ImageService, PlayerService, NotificationService)
+	shortcuts.SetupShortcuts(a, w, ImageService, PlayerService, NotificationService, ConfigService)
+	fmt.Println("Shortcuts setup...")
 
 	ticker := time.NewTicker(100 * time.Millisecond)
 	handleResize := utils.Debounce(func() {

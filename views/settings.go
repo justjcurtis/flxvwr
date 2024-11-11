@@ -2,13 +2,14 @@ package views
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"strconv"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
-	"github.com/spf13/viper"
+	"github.com/justjcurtis/flxvwr/services"
 )
 
 func floatValidator(s string) error {
@@ -23,12 +24,12 @@ func floatValidator(s string) error {
 	return nil
 }
 
-func Settings(a fyne.App) fyne.Window {
+func Settings(a fyne.App, cs *services.ConfigService) fyne.Window {
 	settingsWindow := a.NewWindow("Settings")
 	settingsWindow.Resize(fyne.NewSize(200, 150))
 	settingsWindow.SetFixedSize(true)
-	delayConfig := viper.GetFloat64("delay")
-	shuffleConfig := viper.GetBool("shuffle")
+	delayConfig := cs.GetDelay().Seconds()
+	shuffleConfig := cs.GetShuffle()
 
 	delayEntry := widget.NewEntry()
 	delayEntry.Validator = floatValidator
@@ -38,19 +39,15 @@ func Settings(a fyne.App) fyne.Window {
 			return
 		}
 		delay, _ := strconv.ParseFloat(s, 64)
-		viper.Set("delay", delay)
-		if err := viper.WriteConfig(); err != nil {
-			log.Println("Error writing config:", err)
-		}
+		delayDuration := time.Duration(delay) * time.Second
+		fmt.Println(delayDuration)
+		cs.SetDelay(delayDuration)
 	}
 
 	shuffleCheck := widget.NewCheck("Shuffle", func(bool) {})
 	shuffleCheck.SetChecked(shuffleConfig)
 	shuffleCheck.OnChanged = func(checked bool) {
-		viper.Set("shuffle", checked)
-		if err := viper.WriteConfig(); err != nil {
-			log.Println("Error writing config:", err)
-		}
+		cs.SetShuffle(checked)
 	}
 
 	settingsWindow.SetContent(container.NewVBox(
@@ -65,5 +62,19 @@ func Settings(a fyne.App) fyne.Window {
 			settingsWindow.Close()
 		}),
 	))
+
+	settingsWindow.Canvas().SetOnTypedKey(func(e *fyne.KeyEvent) {
+		fmt.Println(e.Name)
+		if e.Name == "Escape" {
+			settingsWindow.Close()
+		}
+		if e.Name == "Return" {
+			settingsWindow.Close()
+		}
+		if e.Name == "Q" {
+			settingsWindow.Close()
+		}
+	})
+
 	return settingsWindow
 }
