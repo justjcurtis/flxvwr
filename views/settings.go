@@ -2,7 +2,6 @@ package views
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -40,7 +39,6 @@ func Settings(a fyne.App, cs *services.ConfigService) fyne.Window {
 		}
 		delay, _ := strconv.ParseFloat(s, 64)
 		delayDuration := time.Duration(delay) * time.Second
-		fmt.Println(delayDuration)
 		cs.SetDelay(delayDuration)
 	}
 
@@ -64,7 +62,6 @@ func Settings(a fyne.App, cs *services.ConfigService) fyne.Window {
 	))
 
 	settingsWindow.Canvas().SetOnTypedKey(func(e *fyne.KeyEvent) {
-		fmt.Println(e.Name)
 		if e.Name == "Escape" {
 			settingsWindow.Close()
 		}

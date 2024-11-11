@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/justjcurtis/flxvwr/services"
@@ -24,21 +23,16 @@ func main() {
 	a := app.New()
 	a.Settings().SetTheme(theme.DarkTheme()) // TODO: create custom dark theme as theme.DarkTheme() is deprecated
 	w := a.NewWindow("flxvwr")
-	fmt.Println("flxvwr starting...")
 	w.Resize(fyne.NewSize(800, 600))
 
-	fmt.Println("Creating services...")
 	ConfigService := services.NewConfigService()
-	fmt.Println("Subscribing to config updates...")
 	ImageService = services.NewImageService()
 	ConfigService.Subscribe(ImageService.HandleConfigUpdate)
 	PlayerService := services.NewPlayerService()
 	ConfigService.Subscribe(PlayerService.HandleConfigUpdate)
 	NotificationService := services.NewNotificationService(w)
-	fmt.Println("finishing services...")
 
 	shortcuts.SetupShortcuts(a, w, ImageService, PlayerService, NotificationService, ConfigService)
-	fmt.Println("Shortcuts setup...")
 
 	ticker := time.NewTicker(100 * time.Millisecond)
 	handleResize := utils.Debounce(func() {
