@@ -53,6 +53,10 @@ func ReadLines(uri fyne.URI) []string {
 }
 
 func GetURIFromLine(line string) (fyne.URI, error) {
+	EXTRegex := `^#EXT`
+	if strings.HasPrefix(line, "#") && !strings.HasPrefix(line, EXTRegex) {
+		return nil, fmt.Errorf("URI is a comment: %s", line)
+	}
 	if !strings.HasPrefix(line, "file://") {
 		absPath, err := filepath.Abs(line)
 		if err != nil {
@@ -75,7 +79,9 @@ func GetURIsFromLines(lines []string) []fyne.URI {
 	for _, line := range lines {
 		uri, err := GetURIFromLine(line)
 		if err != nil {
-			log.Println(err)
+			if !strings.Contains(err.Error(), "#EXT") {
+				log.Println(err)
+			}
 			continue
 		}
 		uris = append(uris, uri)

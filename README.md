@@ -124,7 +124,6 @@ Launch flxvwr, drag&drop images, directories and/or playlist files into the wind
 
 ## Roadmap
 
-- **Add proper .m3u playlist support**: Add support for .m3u playlist files.
 - **Publish Releases**: Publish releases to ~~AUR~~, Homebrew, and Chocolatey.
 - **Playlist Management**: Add support for creating, saving, and loading playlists.
 - **Customisable Key Bindings**: Allow users to customise key bindings for navigation and controls.

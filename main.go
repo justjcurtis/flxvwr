@@ -59,8 +59,6 @@ func main() {
 
 	w.SetContent(views.StartView(a))
 
-	args := utils.GetArgs()
-
 	w.SetOnDropped(func(pos fyne.Position, uris []fyne.URI) {
 		ImageService.ImportImages(uris)
 		if ImageService.GetCurrent() != nil {
@@ -70,6 +68,7 @@ func main() {
 		}
 	})
 
+	args := utils.GetArgs()
 	if len(args) > 0 {
 		uris := utils.GetURIsFromLines(args)
 		ImageService.ImportImages(uris)
