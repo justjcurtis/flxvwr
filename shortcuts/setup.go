@@ -87,10 +87,12 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 				return
 			}
 			isShowingShortcuts = false
-			is.Update(w, ps, false)
-			if !ps.IsPlaying && wasPlaying {
-				ns.SetNotification("Playing")
-				ps.PlayPause()
+			if is.Zoomable != nil {
+				is.Update(w, ps, false)
+				if !ps.IsPlaying && wasPlaying {
+					ns.SetNotification("Playing")
+					ps.PlayPause()
+				}
 			}
 		}
 		if input == "Escape" {

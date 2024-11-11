@@ -71,6 +71,9 @@ func Settings(a fyne.App, cs *services.ConfigService) fyne.Window {
 		if e.Name == "Q" {
 			settingsWindow.Close()
 		}
+		if e.Name == "/" {
+			settingsWindow.Close()
+		}
 	})
 
 	return settingsWindow

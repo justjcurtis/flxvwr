@@ -206,6 +206,7 @@ func (is *ImageService) Clear() {
 	is.imageStates = make(map[string]string)
 	is.currentIndex = 0
 	is.currentPlaylist = 0
+	is.Zoomable = nil
 	for i := 0; i < 10; i++ {
 		is.playlists[i] = make(map[string]fyne.URI)
 	}
