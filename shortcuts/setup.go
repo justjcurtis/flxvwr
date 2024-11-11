@@ -110,6 +110,9 @@ func SetupShortcuts(a fyne.App, w fyne.Window, is *services.ImageService, ps *se
 			w.SetContent(views.StartView(a))
 		}
 		if input == "E" {
+			if is.Zoomable == nil {
+				return
+			}
 			if ps.IsPlaying {
 				wasPlaying = true
 				ps.PlayPause()
