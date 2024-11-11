@@ -41,6 +41,10 @@ This project is a simple, cross-platform image viewer written in Go using the [F
 - **B/N**: Adjust brightness up/down
 - **V/M**: Adjust contrast up/down
 - **Shift+...**: Smaller increments for adjustments and movements
+- **Shift+1 to 9**: Add current image to a numbered playlist slot
+- **1 to 9**: Switch to a numbered playlist slot
+- **X**: Remove current image from the playlist
+- **F1 | ?**: Show/hide shortcuts
 - **/**: Open settings
 
 ## Installation
